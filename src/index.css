@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-heading: 'DM Serif Display', Georgia, serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@theme {
+  --font-serif: var(--font-heading);
+  --font-sans: var(--font-sans);
+
+  --color-krishi-dark: #132a22;
+  --color-krishi-green: #1b4332;
+  --color-krishi-leaf: #2d6a4f;
+  --color-krishi-accent: #40916c;
+  --color-krishi-sprout: #74c69d;
+  --color-krishi-amber: #d97706;
+  --color-krishi-terracotta: #c8553d;
+  --color-krishi-wheat: #e9c46a;
+  --color-krishi-cream: #faf8f5;
+  --color-krishi-card: #ffffff;
+}
+
+.font-serif-display {
+  font-family: 'DM Serif Display', Georgia, serif;
+}
+
+.font-body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Crisp Earthy Pattern Background for Light Mode */
+.bg-earth-pattern {
+  background-color: #faf8f5;
+  background-image: radial-gradient(#2d6a4f 0.6px, transparent 0.6px), radial-gradient(#d97706 0.6px, #faf8f5 0.6px);
+  background-size: 28px 28px;
+  background-position: 0 0, 14px 14px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #faf8f5;
+}
+::-webkit-scrollbar-thumb {
+  background: #2d6a4f;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1b4332;
+}
+
+/* High contrast focus ring */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] focus:ring-offset-2;
+}
