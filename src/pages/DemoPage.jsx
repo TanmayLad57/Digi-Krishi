@@ -24,13 +24,13 @@ import {
   UserPlus
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { recordFarmerQuery } from '../data/mockCases';
 
 export default function DemoPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, currentUser } = useAuth();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('text-ai');
-  const [escalated, setEscalated] = useState(false);
   const [showAuthGateModal, setShowAuthGateModal] = useState(false);
 
   // Tab 1: Ask AI (Text) State
@@ -42,10 +42,12 @@ export default function DemoPage() {
   // Tab 2: Voice Query State
   const [voiceState, setVoiceState] = useState('idle'); // 'idle' | 'recording' | 'processing' | 'done'
   const [voiceTimer, setVoiceTimer] = useState(0);
+  const [voiceAnswer, setVoiceAnswer] = useState(null);
 
   // Tab 3: Crop Disease Scan State
   const [scanState, setScanState] = useState('idle'); // 'idle' | 'scanning' | 'done'
   const [scannedImage, setScannedImage] = useState(null);
+  const [scanAnswer, setScanAnswer] = useState(null);
   const fileInputRef = useRef(null);
 
   // Tab 4: Government Schemes State
@@ -53,6 +55,7 @@ export default function DemoPage() {
   const [selectedScheme, setSelectedScheme] = useState('pm-kisan');
   const [farmerIdInput, setFarmerIdInput] = useState('');
   const [isVerifyingScheme, setIsVerifyingScheme] = useState(false);
+  const [schemeAnswer, setSchemeAnswer] = useState(null);
 
   // Intercept action if user is not logged in
   const checkAuthOrGate = (onAuthenticatedAction) => {
@@ -73,40 +76,66 @@ export default function DemoPage() {
 
   // Submit Text AI Query
   const handleTextSubmit = (queryToSubmit) => {
-    const q = queryToSubmit || userQuery;
-    if (!q.trim()) return;
+    const q = (queryToSubmit || userQuery || '').trim();
+    if (!q) return;
 
     checkAuthOrGate(() => {
       setUserQuery(q);
       setIsAnalyzingText(true);
-      setEscalated(false);
 
       setTimeout(() => {
         setIsAnalyzingText(false);
         setTextSubmitted(true);
 
+        let answerData = {};
         if (q.toLowerCase().includes('banana') || q.toLowerCase().includes('black spot')) {
-          setActiveAnswer({
+          answerData = {
+            queryType: 'Ask AI Text',
+            question: q,
             query: q,
+            crop: 'Banana',
+            aiDiagnosis: 'Black Sigatoka Leaf Spot (Fungal Infection)',
             diagnosis: 'Black Sigatoka Leaf Spot (Fungal Infection)',
-            remedy: 'Prune heavily infected lower leaves immediately. Apply Copper Oxychloride 50% WP @ 3g/liter water or Propiconazole 25% EC (1ml/liter). Maintain 2.5m plant spacing to reduce canopy humidity.',
+            remedy: 'Prune heavily infected lower leaves immediately. Apply Copper Oxychloride 50% WP @ 3g/liter water or Propiconazole 25% EC (1ml/liter). Maintain 2.5m plant spacing.',
             weatherAlert: 'Rain forecasted in 48 hours in your district. Spray immediately before rainfall.',
-          });
+            aiConfidence: 78, // < 80% -> Auto-escalates!
+          };
         } else if (q.toLowerCase().includes('cotton') || q.toLowerCase().includes('yellow')) {
-          setActiveAnswer({
+          answerData = {
+            queryType: 'Ask AI Text',
+            question: q,
             query: q,
+            crop: 'Cotton',
+            aiDiagnosis: 'Yellow Leaf Rust / Nitrogen Deficiency',
             diagnosis: 'Yellow Leaf Rust / Nitrogen Deficiency',
             remedy: 'Spray 1% Urea solution mixed with Neem oil formulation (5ml/L water). Apply Propiconazole if rust exceeds 10% leaf surface.',
             weatherAlert: 'Humidity above 80% — ideal for fungal spread. Monitor fields daily.',
-          });
+            aiConfidence: 68, // < 80% -> Auto-escalates!
+          };
         } else {
-          setActiveAnswer({
+          answerData = {
+            queryType: 'Ask AI Text',
+            question: q,
             query: q,
+            crop: 'Wheat',
+            aiDiagnosis: 'General Agronomy & Pest Prevention Advisory',
             diagnosis: 'General Agronomy & Pest Prevention Advisory',
-            remedy: `Based on ICAR agronomy guidelines: Apply balanced NPK (12:32:16) ratio and incorporate 2 tons/acre organic farmyard manure. Spray Neem oil (5ml/L) as a preventive measure.`,
+            remedy: `Based on ICAR agronomy guidelines for "${q}": Apply balanced NPK (12:32:16) ratio and incorporate 2 tons/acre organic farmyard manure. Spray Neem oil (5ml/L) as preventive.`,
             weatherAlert: 'Normal micro-climate forecast for your taluka.',
-          });
+            aiConfidence: 94, // ≥ 80% -> AI Resolved!
+          };
         }
+
+        const { isEscalated } = recordFarmerQuery({
+          ...answerData,
+          farmerName: currentUser?.name || 'Rajesh Patil',
+          farmerPhone: currentUser?.phone || '9876543210',
+        });
+
+        setActiveAnswer({
+          ...answerData,
+          isEscalated,
+        });
       }, 1000);
     });
   };
@@ -116,7 +145,6 @@ export default function DemoPage() {
     checkAuthOrGate(() => {
       setVoiceState('recording');
       setVoiceTimer(3);
-      setEscalated(false);
 
       const interval = setInterval(() => {
         setVoiceTimer((prev) => {
@@ -125,6 +153,26 @@ export default function DemoPage() {
             setVoiceState('processing');
             setTimeout(() => {
               setVoiceState('done');
+              const vData = {
+                queryType: 'Voice Query (Hindi)',
+                question: 'मानसून की बारिश के बाद धान की फसल में तना छेदक (Stem Borer) से बचाव के उपाय बताएं?',
+                query: 'मानसून की बारिश के बाद धान की फसल में तना छेदक (Stem Borer) से बचाव के उपाय बताएं?',
+                audioTranscript: 'मानसून की बारिश के बाद धान की फसल में तना छेदक (Stem Borer) से बचाव के उपाय बताएं?',
+                crop: 'Paddy (Rice)',
+                aiDiagnosis: 'Paddy Stem Borer (Scirpophaga incertulas)',
+                diagnosis: 'Paddy Stem Borer (Scirpophaga incertulas)',
+                remedy: 'नमस्कार किसान भाई! खेत में प्रकाश प्रपंच (Light Trap) लगाएं और 5-6 ट्राइकोकार्ड प्रति एकड़ स्थापित करें। कारटाप हाइड्रोक्लोराइड 4% जीआर (5 किग्रा/एकड़) का प्रयोग करें।',
+                weatherAlert: 'Normal micro-climate forecast for your taluka.',
+                aiConfidence: 92, // ≥ 80% -> AI Resolved!
+              };
+
+              const { isEscalated } = recordFarmerQuery({
+                ...vData,
+                farmerName: currentUser?.name || 'Rajesh Patil',
+                farmerPhone: currentUser?.phone || '9876543210',
+              });
+
+              setVoiceAnswer({ ...vData, isEscalated });
             }, 1200);
             return 0;
           }
@@ -139,9 +187,28 @@ export default function DemoPage() {
     checkAuthOrGate(() => {
       if (e.target.files && e.target.files[0]) {
         setVoiceState('processing');
-        setEscalated(false);
         setTimeout(() => {
           setVoiceState('done');
+          const vData = {
+            queryType: 'Voice Query (Uploaded Audio)',
+            question: 'Uploaded Hindi Audio Note regarding Stem Borer advisory.',
+            query: 'Uploaded Hindi Audio Note regarding Stem Borer advisory.',
+            audioTranscript: 'मानसून की बारिश के बाद धान की फसल में तना छेदक से बचाव के उपाय बताएं?',
+            crop: 'Paddy (Rice)',
+            aiDiagnosis: 'Paddy Stem Borer Pest Risk',
+            diagnosis: 'Paddy Stem Borer Pest Risk',
+            remedy: 'Apply Cartap Hydrochloride 4% GR @ 5 kg/acre in standing water.',
+            weatherAlert: 'High moisture level detected in root zone.',
+            aiConfidence: 76, // < 80% -> Auto-escalates!
+          };
+
+          const { isEscalated } = recordFarmerQuery({
+            ...vData,
+            farmerName: currentUser?.name || 'Rajesh Patil',
+            farmerPhone: currentUser?.phone || '9876543210',
+          });
+
+          setVoiceAnswer({ ...vData, isEscalated });
         }, 1200);
       }
     });
@@ -152,10 +219,29 @@ export default function DemoPage() {
     checkAuthOrGate(() => {
       setScannedImage(imageSrc);
       setScanState('scanning');
-      setEscalated(false);
 
       setTimeout(() => {
         setScanState('done');
+        const sData = {
+          queryType: 'Crop Photo Scan',
+          question: 'Crop photo: Cotton leaf yellow rust diagnostic scan',
+          query: 'Crop photo: Cotton leaf yellow rust diagnostic scan',
+          photoUrl: imageSrc,
+          crop: 'Cotton',
+          aiDiagnosis: 'Yellow Leaf Rust (Puccinia striiformis)',
+          diagnosis: 'Yellow Leaf Rust (Puccinia striiformis)',
+          remedy: 'Neem oil spray solution (5ml/L water) or Propiconazole 25% EC @ 1ml/liter water early morning.',
+          weatherAlert: 'High humidity expected tomorrow. Spray before rain starts.',
+          aiConfidence: 68, // < 80% -> Auto-escalates!
+        };
+
+        const { isEscalated } = recordFarmerQuery({
+          ...sData,
+          farmerName: currentUser?.name || 'Rajesh Patil',
+          farmerPhone: currentUser?.phone || '9876543210',
+        });
+
+        setScanAnswer({ ...sData, isEscalated });
       }, 1500);
     });
   };
@@ -173,11 +259,29 @@ export default function DemoPage() {
     e.preventDefault();
     checkAuthOrGate(() => {
       setIsVerifyingScheme(true);
-      setEscalated(false);
 
       setTimeout(() => {
         setIsVerifyingScheme(false);
         setSchemeSubmitted(true);
+        const schData = {
+          queryType: 'Government Scheme',
+          question: `PM Kisan Samman Nidhi e-KYC Verification (${farmerIdInput || 'Mock Aadhaar'})`,
+          query: `PM Kisan Samman Nidhi e-KYC Verification (${farmerIdInput || 'Mock Aadhaar'})`,
+          crop: 'Paddy (Rice)',
+          aiDiagnosis: 'PM-KISAN e-KYC Verification Status',
+          diagnosis: 'PM-KISAN e-KYC Verification Status',
+          remedy: '₹2,000 Credited via Direct Benefit Transfer. e-KYC Verified & Bank Account Linked.',
+          weatherAlert: 'e-KYC Active',
+          aiConfidence: 98, // ≥ 80% -> AI Resolved!
+        };
+
+        const { isEscalated } = recordFarmerQuery({
+          ...schData,
+          farmerName: currentUser?.name || 'Rajesh Patil',
+          farmerPhone: currentUser?.phone || '9876543210',
+        });
+
+        setSchemeAnswer({ ...schData, isEscalated });
       }, 1000);
     });
   };
@@ -203,7 +307,7 @@ export default function DemoPage() {
             Digital Krishi AI Engine
           </h1>
           <p className="text-base sm:text-lg text-gray-700 font-body leading-relaxed">
-            Select any feature below to test text questions, voice recording, crop photo scanning, or subsidy verification.
+            Instant agricultural advice powered by AI confidence monitoring. Queries with confidence &lt; 80% are automatically forwarded to extension officers.
           </p>
         </div>
 
@@ -220,7 +324,6 @@ export default function DemoPage() {
                   key={tab.id}
                   onClick={() => {
                     setActiveTab(tab.id);
-                    setEscalated(false);
                   }}
                   className={`py-4 px-3 flex flex-col items-center justify-center gap-1.5 text-xs sm:text-sm font-bold border-b-4 transition-all ${
                     isActive
@@ -320,30 +423,57 @@ export default function DemoPage() {
                             <Sprout className="w-4 h-4" />
                           </div>
                           <span className="text-xs font-bold uppercase tracking-wider text-[#1b4332]">
-                            Digital Krishi Officer Advisory Output
+                            Digital Krishi Advisory Output
                           </span>
                         </div>
-                        <button
-                          onClick={() => { setTextSubmitted(false); setUserQuery(''); }}
-                          className="text-xs font-bold text-[#1b4332] hover:underline"
-                        >
-                          Ask Another Question
-                        </button>
+
+                        {/* AI Confidence Badge */}
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                            activeAnswer.aiConfidence >= 80
+                              ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                              : 'bg-amber-100 text-amber-900 border border-amber-300'
+                          }`}>
+                            AI Confidence: {activeAnswer.aiConfidence}%
+                          </span>
+
+                          <button
+                            onClick={() => { setTextSubmitted(false); setUserQuery(''); }}
+                            className="text-xs font-bold text-[#1b4332] hover:underline ml-2"
+                          >
+                            Ask Another Question
+                          </button>
+                        </div>
                       </div>
+
+                      {/* AUTOMATIC AI ESCALATION NOTICE (IF CONFIDENCE < 80%) */}
+                      {activeAnswer.isEscalated && (
+                        <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 space-y-1">
+                          <div className="flex items-center gap-2 text-xs font-bold text-amber-900">
+                            <ShieldAlert className="w-4 h-4 text-[#d97706] shrink-0" />
+                            <span>Auto-Escalated to Agriculture Officer</span>
+                          </div>
+                          <p className="text-xs font-medium text-amber-900 leading-relaxed">
+                            Our AI confidence score is <strong>{activeAnswer.aiConfidence}%</strong> (below the 80% threshold). This case has been <strong>automatically forwarded</strong> to your local Krishi Vigyan Kendra Extension Officer (Dr. Sunita Sharma) for expert verification. Saved to your <Link to="/farmer-dashboard" className="underline font-bold text-[#1b4332]">Dashboard History</Link>.
+                          </p>
+                        </div>
+                      )}
 
                       <div className="space-y-3">
                         <div>
-                          <span className="text-xs font-bold uppercase text-gray-500">Your Submitted Question:</span>
-                          <p className="text-sm font-bold text-gray-900">"{activeAnswer.query}"</p>
+                          <span className="text-xs font-bold uppercase text-gray-500 block mb-0.5">Submitted Question:</span>
+                          <p className="text-sm font-bold text-gray-900">"{activeAnswer.question || activeAnswer.query}"</p>
                         </div>
 
-                        <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200">
-                          <span className="text-xs font-bold text-amber-900 block">Identified Condition:</span>
-                          <span className="text-base font-bold text-amber-950">{activeAnswer.diagnosis}</span>
+                        <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
+                          <span className="text-xs font-bold text-amber-900 block mb-0.5">Identified Condition:</span>
+                          <span className="text-base font-bold text-amber-950">
+                            {activeAnswer.aiDiagnosis || activeAnswer.diagnosis}
+                          </span>
                         </div>
 
                         <div className="space-y-1.5">
-                          <span className="text-xs font-bold text-gray-900 block">Actionable Remedy & Spray Treatment:</span>
+                          <span className="text-xs font-bold text-gray-900 block">Actionable Remedy & Treatment:</span>
                           <p className="text-xs sm:text-sm text-gray-800 font-body leading-relaxed">
                             {activeAnswer.remedy}
                           </p>
@@ -417,18 +547,18 @@ export default function DemoPage() {
                   {voiceState === 'processing' && (
                     <div className="p-10 rounded-3xl border-2 border-gray-300 bg-gray-50 text-center space-y-3">
                       <RefreshCw className="w-10 h-10 text-[#1b4332] animate-spin mx-auto" />
-                      <h4 className="text-sm font-bold text-gray-800">Transcribing Voice Audio & Cross-Referencing ICAR Database...</h4>
+                      <h4 className="text-sm font-bold text-gray-800">Transcribing Voice Audio & Evaluating AI Confidence...</h4>
                     </div>
                   )}
 
-                  {voiceState === 'done' && (
+                  {voiceState === 'done' && voiceAnswer && (
                     <motion.div
                       initial={{ opacity: 0, y: 15 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="space-y-6"
                     >
                       <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-                        <span className="text-xs font-bold text-gray-500">Recorded Audio Transcription</span>
+                        <span className="text-xs font-bold text-gray-500">Voice Transcription & AI Advisory</span>
                         <button
                           onClick={() => setVoiceState('idle')}
                           className="text-xs font-bold text-[#1b4332] hover:underline"
@@ -437,30 +567,55 @@ export default function DemoPage() {
                         </button>
                       </div>
 
-                      <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
-                          <Mic className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <span className="text-xs font-bold text-gray-500">Transcribed Farmer Voice (Hindi • 0:12)</span>
-                          <p className="text-sm sm:text-base font-bold text-gray-900 italic">
-                            "मानसून की बारिश के बाद धान की फसल में तना छेदक (Stem Borer) से बचाव के उपाय बताएं?"
+                      {/* AUTOMATIC AI ESCALATION NOTICE IF CONFIDENCE < 80% */}
+                      {voiceAnswer.isEscalated && (
+                        <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 space-y-1">
+                          <div className="flex items-center gap-2 text-xs font-bold text-amber-900">
+                            <ShieldAlert className="w-4 h-4 text-[#d97706] shrink-0" />
+                            <span>Auto-Escalated to Agriculture Officer</span>
+                          </div>
+                          <p className="text-xs font-medium text-amber-900 leading-relaxed">
+                            Our AI confidence score is <strong>{voiceAnswer.aiConfidence}%</strong> (below 80%). This query was <strong>automatically routed</strong> to Dr. Sunita Sharma for verification. View on <Link to="/farmer-dashboard" className="underline font-bold text-[#1b4332]">Dashboard History</Link>.
                           </p>
                         </div>
-                      </div>
+                      )}
 
                       <div className="bg-[#faf8f5] p-6 rounded-2xl border-2 border-[#1b4332]/20 space-y-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-[#1b4332] uppercase tracking-wider">
-                            AI Voice Advisory Output (Hindi Audio)
+                        <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-[#1b4332] text-[#e9c46a] flex items-center justify-center">
+                              <Mic className="w-4 h-4" />
+                            </div>
+                            <span className="text-xs font-bold uppercase tracking-wider text-[#1b4332]">
+                              AI Voice Advisory Output
+                            </span>
+                          </div>
+
+                          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900">
+                            AI Confidence: {voiceAnswer.aiConfidence}%
                           </span>
-                          <button className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#1b4332] text-white text-xs font-bold hover:bg-[#2d6a4f] shadow-sm">
-                            <Volume2 className="w-4 h-4 text-[#e9c46a]" /> Play Voice Response
-                          </button>
                         </div>
-                        <p className="text-sm sm:text-base text-gray-800 font-body leading-relaxed">
-                          "नमस्कार किसान भाई! बारिश के बाद धान में तना छेदक का खतरा बढ़ता है। खेत में प्रकाश प्रपंच (Light Trap) लगाएं और 5-6 ट्राइकोकार्ड प्रति एकड़ स्थापित करें। रासायनिक उपचार के लिए कारटाप हाइड्रोक्लोराइड 4% जीआर (5 किग्रा/एकड़) का प्रयोग करें।"
-                        </p>
+
+                        <div className="space-y-3">
+                          <div>
+                            <span className="text-xs font-bold uppercase text-gray-500 block mb-0.5">Submitted Question (Transcribed Voice):</span>
+                            <p className="text-sm font-bold text-gray-900 italic">"{voiceAnswer.question || voiceAnswer.audioTranscript}"</p>
+                          </div>
+
+                          <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
+                            <span className="text-xs font-bold text-amber-900 block mb-0.5">Identified Condition:</span>
+                            <span className="text-base font-bold text-amber-950">
+                              {voiceAnswer.aiDiagnosis || voiceAnswer.diagnosis}
+                            </span>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <span className="text-xs font-bold text-gray-900 block">Actionable Remedy & Spray Treatment:</span>
+                            <p className="text-xs sm:text-sm text-gray-800 font-body leading-relaxed">
+                              {voiceAnswer.remedy}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </motion.div>
                   )}
@@ -520,14 +675,7 @@ export default function DemoPage() {
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-300 text-xs font-bold text-gray-800 hover:bg-[#1b4332]/10 hover:border-[#1b4332]"
                           >
                             <ImageIcon className="w-4 h-4 text-[#d97706]" />
-                            <span>Sample 1: Yellow Leaf Rust on Cotton</span>
-                          </button>
-                          <button
-                            onClick={() => triggerPhotoScan('/images/hero.png')}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-300 text-xs font-bold text-gray-800 hover:bg-[#1b4332]/10 hover:border-[#1b4332]"
-                          >
-                            <ImageIcon className="w-4 h-4 text-[#1b4332]" />
-                            <span>Sample 2: Wheat Field Health Scan</span>
+                            <span>Sample 1: Yellow Leaf Rust on Cotton (68% Confidence)</span>
                           </button>
                         </div>
                       </div>
@@ -544,7 +692,7 @@ export default function DemoPage() {
                     </div>
                   )}
 
-                  {scanState === 'done' && (
+                  {scanState === 'done' && scanAnswer && (
                     <motion.div
                       initial={{ opacity: 0, y: 15 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -560,6 +708,19 @@ export default function DemoPage() {
                         </button>
                       </div>
 
+                      {/* AUTOMATIC AI ESCALATION NOTICE IF CONFIDENCE < 80% */}
+                      {scanAnswer.isEscalated && (
+                        <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 space-y-1">
+                          <div className="flex items-center gap-2 text-xs font-bold text-amber-900">
+                            <ShieldAlert className="w-4 h-4 text-[#d97706] shrink-0" />
+                            <span>Auto-Escalated to Agriculture Officer</span>
+                          </div>
+                          <p className="text-xs font-medium text-amber-900 leading-relaxed">
+                            Computer vision confidence score is <strong>{scanAnswer.aiConfidence}%</strong> (below 80%). This crop leaf scan has been <strong>automatically sent</strong> to KVK Officer Dr. Sunita Sharma for field verification. Track status on your <Link to="/farmer-dashboard" className="underline font-bold text-[#1b4332]">Dashboard History</Link>.
+                          </p>
+                        </div>
+                      )}
+
                       <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                         <div className="md:col-span-5 relative rounded-2xl overflow-hidden border-2 border-[#1b4332]">
                           <img
@@ -569,32 +730,36 @@ export default function DemoPage() {
                           />
                           <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                             <div className="bg-black/75 backdrop-blur-sm border-2 border-[#e9c46a] text-[#e9c46a] text-xs font-bold px-4 py-2 rounded-xl">
-                              AI Bounding Box Scan: 96% Match
+                              AI Bounding Box Scan: {scanAnswer.aiConfidence}% Match
                             </div>
                           </div>
                         </div>
 
                         <div className="md:col-span-7 space-y-3">
-                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">
-                            Detected: Yellow Leaf Rust (Puccinia striiformis)
-                          </span>
+                          <div>
+                            <span className="text-xs font-bold uppercase text-gray-500 block mb-0.5">Submitted Question / Scan:</span>
+                            <p className="text-sm font-bold text-gray-900">"{scanAnswer.question}"</p>
+                          </div>
 
-                          <h4 className="font-serif-display text-xl font-bold text-[#111827]">
+                          <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
+                            <span className="text-xs font-bold text-amber-900 block mb-0.5">Identified Condition:</span>
+                            <span className="text-base font-bold text-amber-950">
+                              {scanAnswer.aiDiagnosis || scanAnswer.diagnosis}
+                            </span>
+                          </div>
+
+                          <h4 className="font-serif-display text-base font-bold text-[#111827]">
                             Actionable Treatment Plan:
                           </h4>
 
                           <ul className="space-y-2 text-xs sm:text-sm text-gray-800">
                             <li className="flex items-start gap-2">
                               <CheckCircle2 className="w-4 h-4 text-[#1b4332] shrink-0 mt-0.5" />
-                              <span><strong>Organic Remedy:</strong> Neem oil spray solution (5ml/L water) early morning.</span>
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <CheckCircle2 className="w-4 h-4 text-[#1b4332] shrink-0 mt-0.5" />
-                              <span><strong>Chemical Treatment:</strong> Propiconazole 25% EC @ 1ml/liter water.</span>
+                              <span><strong>Remedy & Treatment:</strong> {scanAnswer.remedy}</span>
                             </li>
                             <li className="flex items-start gap-2">
                               <AlertTriangle className="w-4 h-4 text-[#d97706] shrink-0 mt-0.5" />
-                              <span><strong>Spray Advice:</strong> High humidity expected tomorrow. Spray before rain starts.</span>
+                              <span><strong>Spray Advice:</strong> {scanAnswer.weatherAlert}</span>
                             </li>
                           </ul>
                         </div>
@@ -659,7 +824,7 @@ export default function DemoPage() {
                     </button>
                   </form>
 
-                  {schemeSubmitted && !isVerifyingScheme && (
+                  {schemeSubmitted && !isVerifyingScheme && schemeAnswer && (
                     <motion.div
                       initial={{ opacity: 0, y: 15 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -669,12 +834,9 @@ export default function DemoPage() {
                         <h4 className="font-serif-display text-xl font-bold text-[#111827]">
                           Subsidy Verification Result
                         </h4>
-                        <button
-                          onClick={() => setSchemeSubmitted(false)}
-                          className="text-xs font-bold text-[#1b4332] hover:underline"
-                        >
-                          Check Another Scheme / Reset
-                        </button>
+                        <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900">
+                          AI Confidence: {schemeAnswer.aiConfidence}% (Resolved)
+                        </span>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -696,45 +858,6 @@ export default function DemoPage() {
               )}
 
             </AnimatePresence>
-
-            {/* Officer Escalation Bar */}
-            <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gray-50 p-4 rounded-2xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#1b4332] text-white flex items-center justify-center shrink-0">
-                  <UserCheck className="w-5 h-5" />
-                </div>
-                <div className="text-left">
-                  <div className="text-xs font-bold text-gray-900">Uncertain or Complex Case?</div>
-                  <div className="text-[11px] font-semibold text-gray-600">Route query to a real Krishi Vigyan Kendra Officer</div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => {
-                  checkAuthOrGate(() => {
-                    setEscalated(!escalated);
-                  });
-                }}
-                className={`w-full sm:w-auto px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-                  escalated
-                    ? 'bg-emerald-700 text-white shadow-md'
-                    : 'bg-white text-[#1b4332] border-2 border-[#1b4332] hover:bg-[#1b4332] hover:text-white'
-                }`}
-              >
-                {escalated ? (
-                  <>
-                    <CheckCircle2 className="w-4 h-4 text-[#e9c46a]" />
-                    <span>Escalated to Officer Sharma (Nagpur District)</span>
-                  </>
-                ) : (
-                  <>
-                    <ShieldAlert className="w-4 h-4 text-[#d97706]" />
-                    <span>Escalate to Agriculture Officer</span>
-                  </>
-                )}
-              </button>
-            </div>
-
           </div>
         </div>
 
