@@ -5,6 +5,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import OfficerRouteGuard from './components/OfficerRouteGuard';
+import OfficerLayout from './components/OfficerLayout';
 
 import HomePage from './pages/HomePage';
 import DemoPage from './pages/DemoPage';
@@ -14,45 +16,62 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import FarmerDashboardPage from './pages/FarmerDashboardPage';
 import OfficerDashboardPage from './pages/OfficerDashboardPage';
+import OfficerCasesPage from './pages/OfficerCasesPage';
+import OfficerCaseDetailPage from './pages/OfficerCaseDetailPage';
 
 function AnimatedRoutes() {
   const location = useLocation();
+  const isOfficerWorkspace = location.pathname.startsWith('/officer-dashboard');
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
-        transition={{ duration: 0.25, ease: 'easeInOut' }}
-      >
-        <Routes location={location}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/demo" element={<DemoPage />} />
-          <Route path="/how-it-works" element={<HowItWorksPage />} />
-          <Route path="/why-us" element={<WhyUsPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/farmer-dashboard" element={<FarmerDashboardPage />} />
-          <Route path="/officer-dashboard" element={<OfficerDashboardPage />} />
-          <Route path="*" element={<HomePage />} />
-        </Routes>
-      </motion.div>
-    </AnimatePresence>
+    <div className="flex flex-col min-h-screen">
+      {/* Hide marketing Navbar & Footer when inside Officer Work Tool Workspace */}
+      {!isOfficerWorkspace && <Navbar />}
+
+      <main className="flex-grow">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Routes location={location}>
+              {/* Public Marketing Routes */}
+              <Route path="/" element={<HomePage />} />
+              <Route path="/demo" element={<DemoPage />} />
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/why-us" element={<WhyUsPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/farmer-dashboard" element={<FarmerDashboardPage />} />
+
+              {/* Protected Agriculture Officer Work Tool Section */}
+              <Route element={<OfficerRouteGuard />}>
+                <Route path="/officer-dashboard" element={<OfficerLayout />}>
+                  <Route index element={<OfficerDashboardPage />} />
+                  <Route path="cases" element={<OfficerCasesPage />} />
+                  <Route path="cases/:caseId" element={<OfficerCaseDetailPage />} />
+                </Route>
+              </Route>
+
+              {/* Fallback */}
+              <Route path="*" element={<HomePage />} />
+            </Routes>
+          </motion.div>
+        </AnimatePresence>
+      </main>
+
+      {!isOfficerWorkspace && <Footer />}
+    </div>
   );
 }
 
 export default function App() {
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-[#faf8f5] text-gray-900 font-sans selection:bg-[#1b4332] selection:text-white flex flex-col justify-between">
-        <Navbar />
-        <main className="flex-grow">
-          <AnimatedRoutes />
-        </main>
-        <Footer />
-      </div>
+      <AnimatedRoutes />
     </AuthProvider>
   );
 }
