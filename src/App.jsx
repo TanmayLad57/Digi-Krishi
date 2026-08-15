@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 
+import { supabase } from './lib/supabaseClient';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -69,6 +70,8 @@ function AnimatedRoutes() {
 }
 
 export default function App() {
+  console.log('Supabase client:', supabase);
+
   return (
     <AuthProvider>
       <AnimatedRoutes />

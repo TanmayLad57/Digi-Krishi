@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sprout, Lock, UserCheck, ArrowRight, KeyRound, Sparkles, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { loginFarmer, loginOfficer } from '../lib/auth';
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
@@ -10,8 +11,8 @@ export default function LoginPage() {
   const redirectPath = searchParams.get('redirect') || '';
 
   const [role, setRole] = useState(initialRole);
-  const [emailOrPhone, setEmailOrPhone] = useState(role === 'farmer' ? 'farmer@demo.com' : 'officer@demo.com');
-  const [password, setPassword] = useState(role === 'farmer' ? 'farmer123' : 'officer123');
+  const [emailOrPhone, setEmailOrPhone] = useState('');
+  const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -22,29 +23,14 @@ export default function LoginPage() {
   const handleRoleChange = (newRole) => {
     setRole(newRole);
     setErrorMsg('');
-    if (newRole === 'farmer') {
-      setEmailOrPhone('farmer@demo.com');
-      setPassword('farmer123');
-    } else {
-      setEmailOrPhone('officer@demo.com');
-      setPassword('officer123');
-    }
+    setEmailOrPhone('');
+    setPassword('');
   };
 
-  // Autofill demo login button
-  const handleAutofill = () => {
-    setErrorMsg('');
-    if (role === 'farmer') {
-      setEmailOrPhone('farmer@demo.com');
-      setPassword('farmer123');
-    } else {
-      setEmailOrPhone('officer@demo.com');
-      setPassword('officer123');
-    }
-  };
+
 
   // Form submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!emailOrPhone.trim() || !password.trim()) {
       setErrorMsg('Please enter both identifier and password.');
@@ -54,22 +40,28 @@ export default function LoginPage() {
     setIsSubmitting(true);
     setErrorMsg('');
 
-    setTimeout(() => {
-      const res = login(emailOrPhone, password, role);
-      setIsSubmitting(false);
-
-      if (res.success) {
-        if (redirectPath) {
-          navigate(redirectPath);
-        } else if (res.user.role === 'officer') {
-          navigate('/officer-dashboard');
-        } else {
-          navigate('/farmer-dashboard');
-        }
+    try {
+      if (role === 'farmer') {
+        await loginFarmer({ phone: emailOrPhone.trim(), password });
       } else {
-        setErrorMsg('Invalid login credentials. Please try demo accounts.');
+        if (!emailOrPhone.includes('@')) {
+          throw new Error('Please sign in with your official email address (Employee ID login is not supported yet).');
+        }
+        await loginOfficer({ email: emailOrPhone.trim(), password });
       }
-    }, 400);
+
+      if (redirectPath) {
+        navigate(redirectPath);
+      } else if (role === 'officer') {
+        navigate('/officer-dashboard');
+      } else {
+        navigate('/farmer-dashboard');
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'Invalid login credentials. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -128,37 +120,7 @@ export default function LoginPage() {
           </button>
         </div>
 
-        {/* Demo Credentials Alert Box */}
-        <div className="p-4 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/80 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-[#d97706]" />
-              {role === 'farmer' ? 'Farmer Demo Credentials' : 'Officer Demo Credentials'}
-            </span>
-            <button
-              type="button"
-              onClick={handleAutofill}
-              className="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#1b4332] text-white hover:bg-[#2d6a4f] transition-all shadow-sm flex items-center gap-1"
-            >
-              <KeyRound className="w-3 h-3 text-[#e9c46a]" />
-              <span>Autofill</span>
-            </button>
-          </div>
 
-          <div className="text-xs font-mono text-amber-950 font-bold space-y-0.5">
-            {role === 'farmer' ? (
-              <>
-                <div>Email / Phone: <span className="text-[#1b4332]">farmer@demo.com</span> (or 9876543210)</div>
-                <div>Password: <span className="text-[#1b4332]">farmer123</span></div>
-              </>
-            ) : (
-              <>
-                <div>Official Email / ID: <span className="text-[#1b4332]">officer@demo.com</span> (or OFF-1092)</div>
-                <div>Password: <span className="text-[#1b4332]">officer123</span></div>
-              </>
-            )}
-          </div>
-        </div>
 
         {/* Error Alert */}
         {errorMsg && (
@@ -179,7 +141,7 @@ export default function LoginPage() {
               value={emailOrPhone}
               onChange={(e) => setEmailOrPhone(e.target.value)}
               placeholder={role === 'farmer' ? 'e.g. 9876543210 or farmer@demo.com' : 'e.g. officer@demo.com'}
-              className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium text-gray-900"
+              className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
               required
             />
           </div>
@@ -194,7 +156,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium text-gray-900"
+              className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
               required
             />
           </div>

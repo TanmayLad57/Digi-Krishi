@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sprout, UserCheck, ArrowRight, ArrowLeft, CheckCircle2, ShieldCheck, MapPin, Briefcase } from 'lucide-react';
+import { Sprout, UserCheck, ArrowRight, ArrowLeft, CheckCircle2, ShieldCheck, Droplets, Calendar, Layers } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { INDIA_STATES_DISTRICTS, POPULAR_CROPS } from '../data/locationData';
+import { registerFarmer, registerOfficer } from '../lib/auth';
 
 export default function RegisterPage() {
   const [searchParams] = useSearchParams();
@@ -24,6 +25,10 @@ export default function RegisterPage() {
     taluka: '',
     village: '',
     pinCode: '',
+    primaryCrop: 'Paddy (Rice)',
+    secondaryCrop: 'Cotton',
+    cropStage: 'Vegetative Growth Stage',
+    irrigationType: 'Drip Irrigation System',
     crops: ['Paddy (Rice)', 'Cotton'],
     landArea: '4',
   });
@@ -44,6 +49,8 @@ export default function RegisterPage() {
 
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Selected State's districts list
   const availableDistricts = INDIA_STATES_DISTRICTS[farmerForm.state] || INDIA_STATES_DISTRICTS['Maharashtra'];
@@ -67,24 +74,22 @@ export default function RegisterPage() {
     setStep(1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (role === 'farmer') {
-      const res = register({
-        ...farmerForm,
-        role: 'farmer',
-      });
-      if (res.success) {
+    setSubmitError('');
+    setSubmitting(true);
+    try {
+      if (role === 'farmer') {
+        await registerFarmer(farmerForm);
         navigate(redirectPath || '/farmer-dashboard');
-      }
-    } else {
-      const res = register({
-        ...officerForm,
-        role: 'officer',
-      });
-      if (res.success) {
+      } else {
+        await registerOfficer(officerForm);
         navigate(redirectPath || '/officer-dashboard');
       }
+    } catch (err) {
+      setSubmitError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -145,13 +150,46 @@ export default function RegisterPage() {
           </button>
         </div>
 
-        {/* Stepper Progress Bar */}
-        <div className="flex items-center justify-between text-xs font-bold border-b border-gray-200 pb-3 text-gray-500">
-          <span className={step === 1 ? 'text-[#1b4332]' : ''}>1. Personal Info</span>
-          <span className={step === 2 ? 'text-[#1b4332]' : ''}>2. Location</span>
-          <span className={step === 3 ? 'text-[#1b4332]' : ''}>
-            {role === 'farmer' ? '3. Crop Context' : '3. Jurisdiction'}
-          </span>
+        {/* Interactive Stepper Navigation Bar */}
+        <div className="grid grid-cols-3 gap-2 border-b border-gray-200 pb-4">
+          <button
+            type="button"
+            onClick={() => setStep(1)}
+            className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl font-bold text-xs transition-all ${
+              step === 1
+                ? 'bg-[#1b4332] text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${step === 1 ? 'bg-white/20 text-white' : 'bg-gray-300 text-gray-800'}`}>1</span>
+            <span className="truncate">Personal Info</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setStep(2)}
+            className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl font-bold text-xs transition-all ${
+              step === 2
+                ? 'bg-[#1b4332] text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${step === 2 ? 'bg-white/20 text-white' : 'bg-gray-300 text-gray-800'}`}>2</span>
+            <span className="truncate">Location</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setStep(3)}
+            className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl font-bold text-xs transition-all ${
+              step === 3
+                ? 'bg-[#1b4332] text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${step === 3 ? 'bg-white/20 text-white' : 'bg-gray-300 text-gray-800'}`}>3</span>
+            <span className="truncate">{role === 'farmer' ? 'Crop Context' : 'Jurisdiction'}</span>
+          </button>
         </div>
 
         {/* Form Body */}
@@ -176,8 +214,7 @@ export default function RegisterPage() {
                         value={farmerForm.name}
                         onChange={(e) => setFarmerForm({ ...farmerForm, name: e.target.value })}
                         placeholder="e.g. Ramesh Patil"
-                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium"
-                        required
+                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
                       />
                     </div>
 
@@ -189,8 +226,7 @@ export default function RegisterPage() {
                           value={farmerForm.phone}
                           onChange={(e) => setFarmerForm({ ...farmerForm, phone: e.target.value })}
                           placeholder="e.g. 9876543210"
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium"
-                          required
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
                         />
                       </div>
 
@@ -201,7 +237,7 @@ export default function RegisterPage() {
                           value={farmerForm.email}
                           onChange={(e) => setFarmerForm({ ...farmerForm, email: e.target.value })}
                           placeholder="farmer@example.com"
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium"
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
                         />
                       </div>
                     </div>
@@ -213,8 +249,7 @@ export default function RegisterPage() {
                         value={farmerForm.password}
                         onChange={(e) => setFarmerForm({ ...farmerForm, password: e.target.value })}
                         placeholder="Create password"
-                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium"
-                        required
+                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
                       />
                     </div>
                   </>
@@ -227,8 +262,7 @@ export default function RegisterPage() {
                         value={officerForm.name}
                         onChange={(e) => setOfficerForm({ ...officerForm, name: e.target.value })}
                         placeholder="e.g. Dr. Sunita Sharma"
-                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium"
-                        required
+                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
                       />
                     </div>
 
@@ -240,8 +274,7 @@ export default function RegisterPage() {
                           value={officerForm.email}
                           onChange={(e) => setOfficerForm({ ...officerForm, email: e.target.value })}
                           placeholder="officer@kvk.gov.in"
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium"
-                          required
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
                         />
                       </div>
 
@@ -252,8 +285,7 @@ export default function RegisterPage() {
                           value={officerForm.officerId}
                           onChange={(e) => setOfficerForm({ ...officerForm, officerId: e.target.value })}
                           placeholder="e.g. OFF-1092"
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium"
-                          required
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
                         />
                       </div>
                     </div>
@@ -265,8 +297,7 @@ export default function RegisterPage() {
                         value={officerForm.password}
                         onChange={(e) => setOfficerForm({ ...officerForm, password: e.target.value })}
                         placeholder="Create password"
-                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium"
-                        required
+                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
                       />
                     </div>
                   </>
@@ -297,7 +328,7 @@ export default function RegisterPage() {
                               district: INDIA_STATES_DISTRICTS[e.target.value]?.[0] || '',
                             })
                           }
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold bg-white"
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
                         >
                           {Object.keys(INDIA_STATES_DISTRICTS).map((st) => (
                             <option key={st} value={st}>{st}</option>
@@ -310,7 +341,7 @@ export default function RegisterPage() {
                         <select
                           value={farmerForm.district}
                           onChange={(e) => setFarmerForm({ ...farmerForm, district: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold bg-white"
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
                         >
                           {availableDistricts.map((dist) => (
                             <option key={dist} value={dist}>{dist}</option>
@@ -321,13 +352,13 @@ export default function RegisterPage() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <label className="block text-xs font-bold text-gray-900 uppercase">Taluka / Tehsil *</label>
+                        <label className="block text-xs font-bold text-gray-900 uppercase">Taluka / Tehsil</label>
                         <input
                           type="text"
                           value={farmerForm.taluka}
                           onChange={(e) => setFarmerForm({ ...farmerForm, taluka: e.target.value })}
                           placeholder="e.g. Katol"
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium"
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
                         />
                       </div>
 
@@ -338,7 +369,7 @@ export default function RegisterPage() {
                           value={farmerForm.village}
                           onChange={(e) => setFarmerForm({ ...farmerForm, village: e.target.value })}
                           placeholder="e.g. Pardi"
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium"
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
                         />
                       </div>
                     </div>
@@ -350,7 +381,7 @@ export default function RegisterPage() {
                       <select
                         value={officerForm.designation}
                         onChange={(e) => setOfficerForm({ ...officerForm, designation: e.target.value })}
-                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold bg-white"
+                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
                       >
                         <option value="Agriculture Officer">Agriculture Officer</option>
                         <option value="Assistant Director of Agriculture">Assistant Director of Agriculture</option>
@@ -366,8 +397,7 @@ export default function RegisterPage() {
                         value={officerForm.department}
                         onChange={(e) => setOfficerForm({ ...officerForm, department: e.target.value })}
                         placeholder="e.g. Krishi Vigyan Kendra, Nagpur"
-                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium"
-                        required
+                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
                       />
                     </div>
                   </>
@@ -375,7 +405,7 @@ export default function RegisterPage() {
               </motion.div>
             )}
 
-            {/* STEP 3: ROLE SPECIFIC DETAILS */}
+            {/* STEP 3: ROLE SPECIFIC DETAILS (CROP CONTEXT DROPDOWNS FOR FARMERS) */}
             {step === 3 && (
               <motion.div
                 key="step3"
@@ -386,11 +416,117 @@ export default function RegisterPage() {
               >
                 {role === 'farmer' ? (
                   <>
-                    <div className="space-y-2">
-                      <label className="block text-xs font-bold text-gray-900 uppercase">
-                        Select Primary Crop(s) Grown:
+                    {/* Primary & Secondary Crop Dropdowns */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="block text-xs font-bold text-gray-900 uppercase flex items-center gap-1">
+                          <Sprout className="w-3.5 h-3.5 text-[#1b4332]" />
+                          <span>Primary Crop *</span>
+                        </label>
+                        <select
+                          value={farmerForm.primaryCrop}
+                          onChange={(e) => {
+                            const selected = e.target.value;
+                            setFarmerForm((prev) => ({
+                              ...prev,
+                              primaryCrop: selected,
+                              crops: Array.from(new Set([selected, ...prev.crops])),
+                            }));
+                          }}
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
+                        >
+                          {POPULAR_CROPS.map((crop) => (
+                            <option key={crop} value={crop}>
+                              {crop}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-xs font-bold text-gray-900 uppercase flex items-center gap-1">
+                          <Layers className="w-3.5 h-3.5 text-[#d97706]" />
+                          <span>Secondary / Intercrop</span>
+                        </label>
+                        <select
+                          value={farmerForm.secondaryCrop}
+                          onChange={(e) => {
+                            const selected = e.target.value;
+                            setFarmerForm((prev) => ({
+                              ...prev,
+                              secondaryCrop: selected,
+                              crops: selected !== 'None' ? Array.from(new Set([...prev.crops, selected])) : prev.crops,
+                            }));
+                          }}
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
+                        >
+                          <option value="None">None (Single Crop)</option>
+                          {POPULAR_CROPS.map((crop) => (
+                            <option key={crop} value={crop}>
+                              {crop}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Crop Growth Stage & Irrigation Type Dropdowns */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="block text-xs font-bold text-gray-900 uppercase flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5 text-[#1b4332]" />
+                          <span>Crop Stage *</span>
+                        </label>
+                        <select
+                          value={farmerForm.cropStage}
+                          onChange={(e) => setFarmerForm({ ...farmerForm, cropStage: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
+                        >
+                          <option value="Sowing / Germination Stage">Sowing / Germination Stage</option>
+                          <option value="Vegetative Growth Stage">Vegetative Growth Stage</option>
+                          <option value="Flowering & Pod/Fruit Formation">Flowering & Pod Formation</option>
+                          <option value="Pre-Harvest / Ripening Stage">Pre-Harvest / Ripening Stage</option>
+                          <option value="Post-Harvest / Land Prep">Post-Harvest / Land Prep</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-xs font-bold text-gray-900 uppercase flex items-center gap-1">
+                          <Droplets className="w-3.5 h-3.5 text-blue-600" />
+                          <span>Irrigation Source *</span>
+                        </label>
+                        <select
+                          value={farmerForm.irrigationType}
+                          onChange={(e) => setFarmerForm({ ...farmerForm, irrigationType: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
+                        >
+                          <option value="Drip Irrigation System">Drip Irrigation System</option>
+                          <option value="Monsoon / Rainfed">Monsoon / Rainfed</option>
+                          <option value="Canal / River Water">Canal / River Water</option>
+                          <option value="Borewell / Tube Well">Borewell / Tube Well</option>
+                          <option value="Sprinkler System">Sprinkler System</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Total Landholding Field */}
+                    <div className="space-y-1">
+                      <label className="block text-xs font-bold text-gray-900 uppercase">Land Area (Acres):</label>
+                      <input
+                        type="number"
+                        value={farmerForm.landArea}
+                        onChange={(e) => setFarmerForm({ ...farmerForm, landArea: e.target.value })}
+                        placeholder="e.g. 5"
+                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
+                      />
+                    </div>
+
+                    {/* Quick Selection Tags */}
+                    <div className="space-y-2 pt-1 border-t border-gray-100">
+                      <label className="block text-[11px] font-bold text-gray-700 uppercase">
+                        Select Any Additional Crops Grown:
                       </label>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5">
                         {POPULAR_CROPS.map((crop) => {
                           const isSelected = farmerForm.crops.includes(crop);
                           return (
@@ -398,7 +534,7 @@ export default function RegisterPage() {
                               key={crop}
                               type="button"
                               onClick={() => handleCropToggle(crop)}
-                              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
+                              className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all border ${
                                 isSelected
                                   ? 'bg-[#1b4332] text-white border-[#1b4332] shadow-sm'
                                   : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
@@ -410,17 +546,6 @@ export default function RegisterPage() {
                         })}
                       </div>
                     </div>
-
-                    <div className="space-y-1 pt-2">
-                      <label className="block text-xs font-bold text-gray-900 uppercase">Land Area (Acres):</label>
-                      <input
-                        type="number"
-                        value={farmerForm.landArea}
-                        onChange={(e) => setFarmerForm({ ...farmerForm, landArea: e.target.value })}
-                        placeholder="e.g. 5"
-                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium"
-                      />
-                    </div>
                   </>
                 ) : (
                   <>
@@ -430,7 +555,7 @@ export default function RegisterPage() {
                         <select
                           value={officerForm.state}
                           onChange={(e) => setOfficerForm({ ...officerForm, state: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold bg-white"
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
                         >
                           {Object.keys(INDIA_STATES_DISTRICTS).map((st) => (
                             <option key={st} value={st}>{st}</option>
@@ -443,7 +568,7 @@ export default function RegisterPage() {
                         <select
                           value={officerForm.district}
                           onChange={(e) => setOfficerForm({ ...officerForm, district: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold bg-white"
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
                         >
                           {officerDistricts.map((dist) => (
                             <option key={dist} value={dist}>{dist}</option>
@@ -459,7 +584,7 @@ export default function RegisterPage() {
                         value={officerForm.talukasCovered}
                         onChange={(e) => setOfficerForm({ ...officerForm, talukasCovered: e.target.value })}
                         placeholder="e.g. Katol, Kalmeshwar, Narkhed"
-                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium"
+                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
                       />
                     </div>
 
@@ -473,6 +598,12 @@ export default function RegisterPage() {
             )}
 
           </AnimatePresence>
+
+          {submitError && (
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs font-bold text-red-700">
+              {submitError}
+            </div>
+          )}
 
           {/* Stepper Navigation Buttons */}
           <div className="flex items-center justify-between pt-4 border-t border-gray-200">
@@ -493,15 +624,16 @@ export default function RegisterPage() {
                 onClick={() => setStep(step + 1)}
                 className="px-6 py-2.5 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs flex items-center gap-1 shadow-sm ml-auto"
               >
-                <span>Next Step</span>
+                <span>Next Step ({step === 1 ? 'Location' : role === 'farmer' ? 'Crop Context' : 'Jurisdiction'})</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             ) : (
               <button
                 type="submit"
-                className="px-7 py-3 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-sm shadow-md flex items-center gap-2 ml-auto"
+                disabled={submitting}
+                className="px-7 py-3 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-sm shadow-md flex items-center gap-2 ml-auto disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <span>Complete Registration</span>
+                <span>{submitting ? 'Creating Account...' : 'Complete Registration'}</span>
                 <CheckCircle2 className="w-4 h-4 text-[#e9c46a]" />
               </button>
             )}

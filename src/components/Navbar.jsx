@@ -59,8 +59,8 @@ export default function Navbar() {
     }, 150);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setUserDropdownOpen(false);
     navigate('/');
   };
