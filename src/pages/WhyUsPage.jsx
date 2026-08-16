@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
   Zap,
@@ -8,37 +9,38 @@ import {
   Languages,
   Sparkles,
   ArrowRight,
-  UserCheck,
-  CheckCircle2
+  UserCheck
 } from 'lucide-react';
 
 export default function WhyUsPage() {
+  const { t } = useTranslation();
+
   const trustPillars = [
     {
       icon: Zap,
-      title: 'Instant 24/7 Answers',
-      description: 'No waiting for office hours or traveling miles to extension centers. Get instant crop disease remedies day or night right in your field.',
+      title: t('whyUs.c1Title'),
+      description: t('whyUs.c1Desc'),
       color: 'bg-[#d97706]/10 text-[#d97706]',
       border: 'border-[#d97706]/30',
     },
     {
       icon: Target,
-      title: 'Personalized to Your Crops & Soil',
-      description: 'Advice isn’t generic — it adapts to your district weather forecast, soil type, and exact crop growth stage (Wheat, Cotton, Paddy, Mustard).',
+      title: t('whyUs.c2Title'),
+      description: t('whyUs.c2Desc'),
       color: 'bg-[#1b4332]/10 text-[#1b4332]',
       border: 'border-[#1b4332]/30',
     },
     {
       icon: ShieldCheck,
-      title: 'Backed by Real Agronomy Experts',
-      description: 'Engineered using verified ICAR research datasets and supported by local Krishi Vigyan Kendra (KVK) extension officers for 100% reliability.',
+      title: t('whyUs.c3Title'),
+      description: t('whyUs.c3Desc'),
       color: 'bg-[#c8553d]/10 text-[#c8553d]',
       border: 'border-[#c8553d]/30',
     },
     {
       icon: Languages,
-      title: 'Voice-First in Native Languages',
-      description: 'Designed for effortless accessibility — speak naturally in Hindi, Marathi, Punjabi, Telugu, and Kannada with clear audio playback.',
+      title: t('whyUs.c4Title'),
+      description: t('whyUs.c4Desc'),
       color: 'bg-[#2d6a4f]/10 text-[#2d6a4f]',
       border: 'border-[#2d6a4f]/30',
     },
@@ -52,13 +54,13 @@ export default function WhyUsPage() {
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#1b4332]/10 text-[#1b4332] text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-4 h-4 text-[#d97706]" />
-            <span>Why Choose Digital Krishi Officer</span>
+            <span>{t('whyUs.badge')}</span>
           </div>
           <h1 className="font-serif-display text-4xl sm:text-5xl font-bold text-[#111827]">
-            Built for Smart Indian Agriculture
+            {t('whyUs.title')}
           </h1>
           <p className="text-base sm:text-lg text-gray-700 font-body leading-relaxed">
-            Delivering trusted agronomy intelligence to every kisan across India with speed, personalization, and expert accountability.
+            {t('whyUs.subtext')}
           </p>
         </div>
 
@@ -110,14 +112,14 @@ export default function WhyUsPage() {
               Seamless Escalation to Extension Officers
             </h2>
             <p className="text-sm text-gray-700 leading-relaxed font-body">
-              Digital Krishi Officer doesn’t replace real experts — it empowers them. When AI encounters complex symptoms or severe pest outbreaks, it immediately queues the case for a local Krishi Vigyan Kendra extension officer for field review.
+              Krishi Sathi doesn't replace real experts — it empowers them. When AI encounters complex symptoms or severe pest outbreaks, it immediately queues the case for a local Krishi Vigyan Kendra extension officer for field review.
             </p>
             <div className="pt-2">
               <Link
                 to="/demo"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#1b4332] text-white font-bold text-sm hover:bg-[#2d6a4f] transition-all shadow-md"
               >
-                <span>Test Escalation in Demo</span>
+                <span>{t('navbar.getStarted')}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

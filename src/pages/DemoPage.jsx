@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MessageSquareText,
@@ -11,9 +12,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   RefreshCw,
-  Volume2,
   ShieldAlert,
-  UserCheck,
   Sprout,
   Upload,
   ImageIcon,
@@ -25,8 +24,13 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { recordFarmerQuery } from '../data/mockCases';
+import { getMockResponses } from '../data/mockResponses';
 
 export default function DemoPage() {
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || 'en';
+  const mockData = getMockResponses(currentLang);
+
   const { isAuthenticated, currentUser } = useAuth();
   const navigate = useNavigate();
 
@@ -67,12 +71,7 @@ export default function DemoPage() {
     return true;
   };
 
-  const samplePrompts = [
-    'My banana leaves have black spots. What should I do?',
-    'Yellow spots on cotton leaves in Vidarbha district',
-    'Best organic fertilizer dose for paddy before monsoons',
-    'How to apply for PM-KISAN 17th installment e-KYC?'
-  ];
+  const samplePrompts = mockData.samplePrompts || [];
 
   // Submit Text AI Query
   const handleTextSubmit = (queryToSubmit) => {
@@ -87,44 +86,34 @@ export default function DemoPage() {
         setIsAnalyzingText(false);
         setTextSubmitted(true);
 
-        let answerData = {};
-        if (q.toLowerCase().includes('banana') || q.toLowerCase().includes('black spot')) {
-          answerData = {
-            queryType: 'Ask AI Text',
-            question: q,
-            query: q,
-            crop: 'Banana',
-            aiDiagnosis: 'Black Sigatoka Leaf Spot (Fungal Infection)',
-            diagnosis: 'Black Sigatoka Leaf Spot (Fungal Infection)',
-            remedy: 'Prune heavily infected lower leaves immediately. Apply Copper Oxychloride 50% WP @ 3g/liter water or Propiconazole 25% EC (1ml/liter). Maintain 2.5m plant spacing.',
-            weatherAlert: 'Rain forecasted in 48 hours in your district. Spray immediately before rainfall.',
-            aiConfidence: 78, // < 80% -> Auto-escalates!
-          };
-        } else if (q.toLowerCase().includes('cotton') || q.toLowerCase().includes('yellow')) {
-          answerData = {
-            queryType: 'Ask AI Text',
-            question: q,
-            query: q,
-            crop: 'Cotton',
-            aiDiagnosis: 'Yellow Leaf Rust / Nitrogen Deficiency',
-            diagnosis: 'Yellow Leaf Rust / Nitrogen Deficiency',
-            remedy: 'Spray 1% Urea solution mixed with Neem oil formulation (5ml/L water). Apply Propiconazole if rust exceeds 10% leaf surface.',
-            weatherAlert: 'Humidity above 80% — ideal for fungal spread. Monitor fields daily.',
-            aiConfidence: 68, // < 80% -> Auto-escalates!
-          };
-        } else {
-          answerData = {
-            queryType: 'Ask AI Text',
-            question: q,
-            query: q,
-            crop: 'Wheat',
-            aiDiagnosis: 'General Agronomy & Pest Prevention Advisory',
-            diagnosis: 'General Agronomy & Pest Prevention Advisory',
-            remedy: `Based on ICAR agronomy guidelines for "${q}": Apply balanced NPK (12:32:16) ratio and incorporate 2 tons/acre organic farmyard manure. Spray Neem oil (5ml/L) as preventive.`,
-            weatherAlert: 'Normal micro-climate forecast for your taluka.',
-            aiConfidence: 94, // ≥ 80% -> AI Resolved!
-          };
+        let template = mockData.textQueries.default;
+        const lowerQ = q.toLowerCase();
+        if (
+          lowerQ.includes('banana') ||
+          lowerQ.includes('black spot') ||
+          lowerQ.includes('केला') ||
+          lowerQ.includes('काले') ||
+          lowerQ.includes('केळी') ||
+          lowerQ.includes('വാഴ') ||
+          lowerQ.includes('കറുത്ത')
+        ) {
+          template = mockData.textQueries.banana;
+        } else if (
+          lowerQ.includes('cotton') ||
+          lowerQ.includes('yellow') ||
+          lowerQ.includes('कपास') ||
+          lowerQ.includes('पीले') ||
+          lowerQ.includes('पिवळे') ||
+          lowerQ.includes('മഞ്ഞ')
+        ) {
+          template = mockData.textQueries.cotton;
         }
+
+        const answerData = {
+          ...template,
+          question: q,
+          query: q,
+        };
 
         const { isEscalated } = recordFarmerQuery({
           ...answerData,
@@ -154,16 +143,7 @@ export default function DemoPage() {
             setTimeout(() => {
               setVoiceState('done');
               const vData = {
-                queryType: 'Voice Query (Hindi)',
-                question: 'मानसून की बारिश के बाद धान की फसल में तना छेदक (Stem Borer) से बचाव के उपाय बताएं?',
-                query: 'मानसून की बारिश के बाद धान की फसल में तना छेदक (Stem Borer) से बचाव के उपाय बताएं?',
-                audioTranscript: 'मानसून की बारिश के बाद धान की फसल में तना छेदक (Stem Borer) से बचाव के उपाय बताएं?',
-                crop: 'Paddy (Rice)',
-                aiDiagnosis: 'Paddy Stem Borer (Scirpophaga incertulas)',
-                diagnosis: 'Paddy Stem Borer (Scirpophaga incertulas)',
-                remedy: 'नमस्कार किसान भाई! खेत में प्रकाश प्रपंच (Light Trap) लगाएं और 5-6 ट्राइकोकार्ड प्रति एकड़ स्थापित करें। कारटाप हाइड्रोक्लोराइड 4% जीआर (5 किग्रा/एकड़) का प्रयोग करें।',
-                weatherAlert: 'Normal micro-climate forecast for your taluka.',
-                aiConfidence: 92, // ≥ 80% -> AI Resolved!
+                ...mockData.voiceQuery
               };
 
               const { isEscalated } = recordFarmerQuery({
@@ -190,16 +170,8 @@ export default function DemoPage() {
         setTimeout(() => {
           setVoiceState('done');
           const vData = {
+            ...mockData.voiceQuery,
             queryType: 'Voice Query (Uploaded Audio)',
-            question: 'Uploaded Hindi Audio Note regarding Stem Borer advisory.',
-            query: 'Uploaded Hindi Audio Note regarding Stem Borer advisory.',
-            audioTranscript: 'मानसून की बारिश के बाद धान की फसल में तना छेदक से बचाव के उपाय बताएं?',
-            crop: 'Paddy (Rice)',
-            aiDiagnosis: 'Paddy Stem Borer Pest Risk',
-            diagnosis: 'Paddy Stem Borer Pest Risk',
-            remedy: 'Apply Cartap Hydrochloride 4% GR @ 5 kg/acre in standing water.',
-            weatherAlert: 'High moisture level detected in root zone.',
-            aiConfidence: 76, // < 80% -> Auto-escalates!
           };
 
           const { isEscalated } = recordFarmerQuery({
@@ -223,16 +195,8 @@ export default function DemoPage() {
       setTimeout(() => {
         setScanState('done');
         const sData = {
-          queryType: 'Crop Photo Scan',
-          question: 'Crop photo: Cotton leaf yellow rust diagnostic scan',
-          query: 'Crop photo: Cotton leaf yellow rust diagnostic scan',
+          ...mockData.scanQuery,
           photoUrl: imageSrc,
-          crop: 'Cotton',
-          aiDiagnosis: 'Yellow Leaf Rust (Puccinia striiformis)',
-          diagnosis: 'Yellow Leaf Rust (Puccinia striiformis)',
-          remedy: 'Neem oil spray solution (5ml/L water) or Propiconazole 25% EC @ 1ml/liter water early morning.',
-          weatherAlert: 'High humidity expected tomorrow. Spray before rain starts.',
-          aiConfidence: 68, // < 80% -> Auto-escalates!
         };
 
         const { isEscalated } = recordFarmerQuery({
@@ -263,16 +227,12 @@ export default function DemoPage() {
       setTimeout(() => {
         setIsVerifyingScheme(false);
         setSchemeSubmitted(true);
+        const schemeObj = mockData.schemes[selectedScheme] || mockData.schemes['pm-kisan'];
+
         const schData = {
-          queryType: 'Government Scheme',
-          question: `PM Kisan Samman Nidhi e-KYC Verification (${farmerIdInput || 'Mock Aadhaar'})`,
-          query: `PM Kisan Samman Nidhi e-KYC Verification (${farmerIdInput || 'Mock Aadhaar'})`,
-          crop: 'Paddy (Rice)',
-          aiDiagnosis: 'PM-KISAN e-KYC Verification Status',
-          diagnosis: 'PM-KISAN e-KYC Verification Status',
-          remedy: '₹2,000 Credited via Direct Benefit Transfer. e-KYC Verified & Bank Account Linked.',
-          weatherAlert: 'e-KYC Active',
-          aiConfidence: 98, // ≥ 80% -> AI Resolved!
+          ...schemeObj,
+          question: `${schemeObj.question} (${farmerIdInput || 'Mock Aadhaar'})`,
+          query: `${schemeObj.query} (${farmerIdInput || 'Mock Aadhaar'})`,
         };
 
         const { isEscalated } = recordFarmerQuery({
@@ -287,10 +247,10 @@ export default function DemoPage() {
   };
 
   const tabs = [
-    { id: 'text-ai', name: 'Ask AI (Text)', icon: MessageSquareText, badge: 'Custom Text Input' },
-    { id: 'voice', name: 'Voice Query (Hindi)', icon: Mic, badge: 'Record or Upload Audio' },
-    { id: 'scan', name: 'Crop Disease Scan', icon: Camera, badge: 'Upload Leaf Photo' },
-    { id: 'scheme', name: 'Government Schemes', icon: Landmark, badge: 'Subsidy Status' },
+    { id: 'text-ai', name: t('aiPage.tabText'), icon: MessageSquareText, badge: t('aiPage.tabTextBadge') },
+    { id: 'voice', name: t('aiPage.tabVoice'), icon: Mic, badge: t('aiPage.tabVoiceBadge') },
+    { id: 'scan', name: t('aiPage.tabScan'), icon: Camera, badge: t('aiPage.tabScanBadge') },
+    { id: 'scheme', name: t('aiPage.tabScheme'), icon: Landmark, badge: t('aiPage.tabSchemeBadge') },
   ];
 
   return (
@@ -301,13 +261,13 @@ export default function DemoPage() {
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#1b4332]/10 text-[#1b4332] text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-4 h-4 text-[#d97706]" />
-            <span>Interactive AI Advisory Engine</span>
+            <span>{t('aiPage.tagline')}</span>
           </div>
           <h1 className="font-serif-display text-4xl sm:text-5xl font-bold text-[#111827]">
-            Digital Krishi AI Engine
+            {t('aiPage.title')}
           </h1>
           <p className="text-base sm:text-lg text-gray-700 font-body leading-relaxed">
-            Instant agricultural advice powered by AI confidence monitoring. Queries with confidence &lt; 80% are automatically forwarded to extension officers.
+            {t('aiPage.subtitle')}
           </p>
         </div>
 
@@ -325,7 +285,7 @@ export default function DemoPage() {
                   onClick={() => {
                     setActiveTab(tab.id);
                   }}
-                  className={`py-4 px-3 flex flex-col items-center justify-center gap-1.5 text-xs sm:text-sm font-bold border-b-4 transition-all ${
+                  className={`py-4 px-3 flex flex-col items-center justify-center gap-1.5 text-xs sm:text-sm font-bold border-b-4 transition-all cursor-pointer ${
                     isActive
                       ? 'border-[#1b4332] text-[#1b4332] bg-white shadow-sm'
                       : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -358,30 +318,30 @@ export default function DemoPage() {
                 >
                   <form onSubmit={(e) => { e.preventDefault(); handleTextSubmit(); }} className="space-y-3">
                     <label className="block text-sm font-bold text-gray-900">
-                      Type Your Agricultural Question Below:
+                      {t('aiPage.typeQuestionLabel')}
                     </label>
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <input
                         type="text"
                         value={userQuery}
                         onChange={(e) => setUserQuery(e.target.value)}
-                        placeholder="e.g., My banana leaves have black spots. What should I do?"
+                        placeholder={t('aiPage.textPlaceholder')}
                         className="flex-1 px-4 py-3.5 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium text-gray-900 shadow-sm"
                       />
                       <button
                         type="submit"
                         disabled={isAnalyzingText}
-                        className="px-6 py-3.5 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-sm shadow-md flex items-center gap-2 shrink-0 transition-all"
+                        className="px-6 py-3.5 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 shrink-0 transition-all cursor-pointer"
                       >
                         {isAnalyzingText ? (
                           <>
                             <RefreshCw className="w-4 h-4 animate-spin" />
-                            <span>Analyzing...</span>
+                            <span>{t('aiPage.btnAnalyzing')}</span>
                           </>
                         ) : (
                           <>
-                            <span>Ask AI</span>
+                            <span>{t('aiPage.btnAsk')}</span>
                             <Send className="w-4 h-4" />
                           </>
                         )}
@@ -389,13 +349,13 @@ export default function DemoPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 pt-1">
-                      <span className="text-xs font-bold text-gray-500">Or click a sample question:</span>
+                      <span className="text-xs font-bold text-gray-500">{t('aiPage.orClickSample')}</span>
                       {samplePrompts.map((prompt, pIdx) => (
                         <button
                           key={pIdx}
                           type="button"
                           onClick={() => handleTextSubmit(prompt)}
-                          className="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 hover:bg-[#1b4332]/10 hover:text-[#1b4332] text-gray-700 border border-gray-200 transition-colors"
+                          className="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 hover:bg-[#1b4332]/10 hover:text-[#1b4332] text-gray-700 border border-gray-200 transition-colors cursor-pointer"
                         >
                           "{prompt}"
                         </button>
@@ -406,8 +366,8 @@ export default function DemoPage() {
                   {!textSubmitted && !isAnalyzingText && (
                     <div className="p-8 rounded-2xl border-2 border-dashed border-gray-300 text-center bg-gray-50 space-y-2">
                       <MessageSquareText className="w-8 h-8 text-gray-400 mx-auto" />
-                      <h4 className="text-sm font-bold text-gray-700">No question submitted yet</h4>
-                      <p className="text-xs text-gray-500">Type any question above or click one of the sample prompt buttons to see the instant AI diagnosis.</p>
+                      <h4 className="text-sm font-bold text-gray-700">{t('aiPage.noQuestionYet')}</h4>
+                      <p className="text-xs text-gray-500">{t('aiPage.noQuestionDesc')}</p>
                     </div>
                   )}
 
@@ -417,13 +377,13 @@ export default function DemoPage() {
                       animate={{ opacity: 1, y: 0 }}
                       className="bg-[#faf8f5] p-6 rounded-2xl border-2 border-[#1b4332]/20 space-y-4 shadow-sm"
                     >
-                      <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-gray-200 pb-3 gap-2">
                         <div className="flex items-center gap-2">
                           <div className="w-7 h-7 rounded-lg bg-[#1b4332] text-[#e9c46a] flex items-center justify-center">
                             <Sprout className="w-4 h-4" />
                           </div>
                           <span className="text-xs font-bold uppercase tracking-wider text-[#1b4332]">
-                            Digital Krishi Advisory Output
+                            {t('aiPage.outputTitle')}
                           </span>
                         </div>
 
@@ -439,9 +399,9 @@ export default function DemoPage() {
 
                           <button
                             onClick={() => { setTextSubmitted(false); setUserQuery(''); }}
-                            className="text-xs font-bold text-[#1b4332] hover:underline ml-2"
+                            className="text-xs font-bold text-[#1b4332] hover:underline ml-2 cursor-pointer"
                           >
-                            Ask Another Question
+                            {t('aiPage.askAnother')}
                           </button>
                         </div>
                       </div>
@@ -451,29 +411,29 @@ export default function DemoPage() {
                         <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 space-y-1">
                           <div className="flex items-center gap-2 text-xs font-bold text-amber-900">
                             <ShieldAlert className="w-4 h-4 text-[#d97706] shrink-0" />
-                            <span>Auto-Escalated to Agriculture Officer</span>
+                            <span>{t('aiPage.escalatedNoticeTitle')}</span>
                           </div>
                           <p className="text-xs font-medium text-amber-900 leading-relaxed">
-                            Our AI confidence score is <strong>{activeAnswer.aiConfidence}%</strong> (below the 80% threshold). This case has been <strong>automatically forwarded</strong> to your local Krishi Vigyan Kendra Extension Officer (Dr. Sunita Sharma) for expert verification. Saved to your <Link to="/farmer-dashboard" className="underline font-bold text-[#1b4332]">Dashboard History</Link>.
+                            {t('aiPage.escalatedNoticeDesc')} View on <Link to="/farmer-dashboard" className="underline font-bold text-[#1b4332]">Dashboard History</Link>.
                           </p>
                         </div>
                       )}
 
                       <div className="space-y-3">
                         <div>
-                          <span className="text-xs font-bold uppercase text-gray-500 block mb-0.5">Submitted Question:</span>
+                          <span className="text-xs font-bold uppercase text-gray-500 block mb-0.5">{t('aiPage.submittedQuestion')}</span>
                           <p className="text-sm font-bold text-gray-900">"{activeAnswer.question || activeAnswer.query}"</p>
                         </div>
 
                         <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
-                          <span className="text-xs font-bold text-amber-900 block mb-0.5">Identified Condition:</span>
+                          <span className="text-xs font-bold text-amber-900 block mb-0.5">{t('aiPage.identifiedCondition')}</span>
                           <span className="text-base font-bold text-amber-950">
                             {activeAnswer.aiDiagnosis || activeAnswer.diagnosis}
                           </span>
                         </div>
 
                         <div className="space-y-1.5">
-                          <span className="text-xs font-bold text-gray-900 block">Actionable Remedy & Treatment:</span>
+                          <span className="text-xs font-bold text-gray-900 block">{t('aiPage.actionableRemedy')}</span>
                           <p className="text-xs sm:text-sm text-gray-800 font-body leading-relaxed">
                             {activeAnswer.remedy}
                           </p>
@@ -506,25 +466,25 @@ export default function DemoPage() {
 
                       <div className="space-y-2 max-w-md mx-auto">
                         <h3 className="font-serif-display text-xl font-bold text-gray-900">
-                          Ask Question via Voice in Your Language
+                          {t('aiPage.voiceHeading')}
                         </h3>
                         <p className="text-xs text-gray-600">
-                          Speak naturally in Hindi, Marathi, Punjabi, or local terms. No typing required!
+                          {t('aiPage.voiceDesc')}
                         </p>
                       </div>
 
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
                         <button
                           onClick={handleStartRecording}
-                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-sm shadow-md transition-all"
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-sm shadow-md transition-all cursor-pointer"
                         >
                           <Mic className="w-5 h-5 text-[#e9c46a]" />
-                          <span>🎤 Tap to Record</span>
+                          <span>{t('aiPage.btnRecord')}</span>
                         </button>
 
                         <label className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full bg-white hover:bg-gray-100 text-gray-800 font-bold text-sm border-2 border-gray-300 shadow-sm cursor-pointer transition-all">
                           <Upload className="w-4 h-4 text-gray-600" />
-                          <span>Upload Audio File</span>
+                          <span>{t('aiPage.btnUploadAudio')}</span>
                           <input type="file" accept="audio/*" className="hidden" onChange={handleAudioUpload} />
                         </label>
                       </div>
@@ -537,9 +497,8 @@ export default function DemoPage() {
                         <Mic className="w-8 h-8" />
                       </div>
                       <div className="space-y-1">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#d97706]">Listening to Voice Input...</span>
-                        <h4 className="text-2xl font-bold text-gray-900 font-serif-display">0:0{voiceTimer} Remaining</h4>
-                        <p className="text-xs text-gray-600 italic">Speaking in Hindi / Regional dialect...</p>
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#d97706]">{t('aiPage.voiceListening')}</span>
+                        <h4 className="text-2xl font-bold text-gray-900 font-serif-display">0:0{voiceTimer} {t('aiPage.remaining')}</h4>
                       </div>
                     </div>
                   )}
@@ -547,7 +506,7 @@ export default function DemoPage() {
                   {voiceState === 'processing' && (
                     <div className="p-10 rounded-3xl border-2 border-gray-300 bg-gray-50 text-center space-y-3">
                       <RefreshCw className="w-10 h-10 text-[#1b4332] animate-spin mx-auto" />
-                      <h4 className="text-sm font-bold text-gray-800">Transcribing Voice Audio & Evaluating AI Confidence...</h4>
+                      <h4 className="text-sm font-bold text-gray-800">{t('aiPage.voiceProcessing')}</h4>
                     </div>
                   )}
 
@@ -558,12 +517,12 @@ export default function DemoPage() {
                       className="space-y-6"
                     >
                       <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-                        <span className="text-xs font-bold text-gray-500">Voice Transcription & AI Advisory</span>
+                        <span className="text-xs font-bold text-gray-500">{t('aiPage.voiceOutputTitle')}</span>
                         <button
                           onClick={() => setVoiceState('idle')}
-                          className="text-xs font-bold text-[#1b4332] hover:underline"
+                          className="text-xs font-bold text-[#1b4332] hover:underline cursor-pointer"
                         >
-                          Record Again / Reset
+                          {t('aiPage.recordAgain')}
                         </button>
                       </div>
 
@@ -572,10 +531,10 @@ export default function DemoPage() {
                         <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 space-y-1">
                           <div className="flex items-center gap-2 text-xs font-bold text-amber-900">
                             <ShieldAlert className="w-4 h-4 text-[#d97706] shrink-0" />
-                            <span>Auto-Escalated to Agriculture Officer</span>
+                            <span>{t('aiPage.escalatedNoticeTitle')}</span>
                           </div>
                           <p className="text-xs font-medium text-amber-900 leading-relaxed">
-                            Our AI confidence score is <strong>{voiceAnswer.aiConfidence}%</strong> (below 80%). This query was <strong>automatically routed</strong> to Dr. Sunita Sharma for verification. View on <Link to="/farmer-dashboard" className="underline font-bold text-[#1b4332]">Dashboard History</Link>.
+                            {t('aiPage.escalatedNoticeDesc')} View on <Link to="/farmer-dashboard" className="underline font-bold text-[#1b4332]">Dashboard History</Link>.
                           </p>
                         </div>
                       )}
@@ -587,7 +546,7 @@ export default function DemoPage() {
                               <Mic className="w-4 h-4" />
                             </div>
                             <span className="text-xs font-bold uppercase tracking-wider text-[#1b4332]">
-                              AI Voice Advisory Output
+                              {t('aiPage.voiceOutputTitle')}
                             </span>
                           </div>
 
@@ -598,19 +557,19 @@ export default function DemoPage() {
 
                         <div className="space-y-3">
                           <div>
-                            <span className="text-xs font-bold uppercase text-gray-500 block mb-0.5">Submitted Question (Transcribed Voice):</span>
+                            <span className="text-xs font-bold uppercase text-gray-500 block mb-0.5">{t('aiPage.submittedQuestion')}</span>
                             <p className="text-sm font-bold text-gray-900 italic">"{voiceAnswer.question || voiceAnswer.audioTranscript}"</p>
                           </div>
 
                           <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
-                            <span className="text-xs font-bold text-amber-900 block mb-0.5">Identified Condition:</span>
+                            <span className="text-xs font-bold text-amber-900 block mb-0.5">{t('aiPage.identifiedCondition')}</span>
                             <span className="text-base font-bold text-amber-950">
                               {voiceAnswer.aiDiagnosis || voiceAnswer.diagnosis}
                             </span>
                           </div>
 
                           <div className="space-y-1.5">
-                            <span className="text-xs font-bold text-gray-900 block">Actionable Remedy & Spray Treatment:</span>
+                            <span className="text-xs font-bold text-gray-900 block">{t('aiPage.actionableRemedy')}</span>
                             <p className="text-xs sm:text-sm text-gray-800 font-body leading-relaxed">
                               {voiceAnswer.remedy}
                             </p>
@@ -639,10 +598,10 @@ export default function DemoPage() {
 
                       <div className="space-y-2 max-w-md mx-auto">
                         <h3 className="font-serif-display text-xl font-bold text-gray-900">
-                          Upload Crop Photo for AI Disease Scan
+                          {t('aiPage.scanHeading')}
                         </h3>
                         <p className="text-xs text-gray-600">
-                          Select a leaf or crop photo from your smartphone. AI computer vision pinpoints diseases instantly.
+                          {t('aiPage.scanDesc')}
                         </p>
                       </div>
 
@@ -660,22 +619,22 @@ export default function DemoPage() {
                               fileInputRef.current?.click();
                             });
                           }}
-                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-sm shadow-md transition-all"
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-sm shadow-md transition-all cursor-pointer"
                         >
                           <Upload className="w-5 h-5 text-[#e9c46a]" />
-                          <span>📷 Upload Crop Photo</span>
+                          <span>{t('aiPage.btnUploadPhoto')}</span>
                         </button>
                       </div>
 
                       <div className="pt-4 border-t border-gray-200">
-                        <span className="text-xs font-bold text-gray-500 block mb-2">Or test with a sample crop photo preset:</span>
+                        <span className="text-xs font-bold text-gray-500 block mb-2">{t('aiPage.presetSample')}</span>
                         <div className="flex flex-wrap items-center justify-center gap-3">
                           <button
                             onClick={() => triggerPhotoScan('/images/disease-scanner.png')}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-300 text-xs font-bold text-gray-800 hover:bg-[#1b4332]/10 hover:border-[#1b4332]"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-300 text-xs font-bold text-gray-800 hover:bg-[#1b4332]/10 hover:border-[#1b4332] cursor-pointer"
                           >
                             <ImageIcon className="w-4 h-4 text-[#d97706]" />
-                            <span>Sample 1: Yellow Leaf Rust on Cotton (68% Confidence)</span>
+                            <span>{t('aiPage.sample1Btn')}</span>
                           </button>
                         </div>
                       </div>
@@ -686,8 +645,8 @@ export default function DemoPage() {
                     <div className="p-12 rounded-3xl border-2 border-[#1b4332] bg-gray-50 text-center space-y-4">
                       <RefreshCw className="w-12 h-12 text-[#1b4332] animate-spin mx-auto" />
                       <div className="space-y-1">
-                        <h4 className="font-serif-display text-xl font-bold text-gray-900">Scanning Image with Computer Vision...</h4>
-                        <p className="text-xs text-gray-600">Matching leaf symptoms with 10,000+ agricultural disease patterns.</p>
+                        <h4 className="font-serif-display text-xl font-bold text-gray-900">{t('aiPage.scanningText')}</h4>
+                        <p className="text-xs text-gray-600">{t('aiPage.scanningDesc')}</p>
                       </div>
                     </div>
                   )}
@@ -699,12 +658,12 @@ export default function DemoPage() {
                       className="space-y-4"
                     >
                       <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-                        <span className="text-xs font-bold text-gray-500">Scan Diagnostic Complete</span>
+                        <span className="text-xs font-bold text-gray-500">{t('aiPage.scanComplete')}</span>
                         <button
                           onClick={() => { setScanState('idle'); setScannedImage(null); }}
-                          className="text-xs font-bold text-[#1b4332] hover:underline"
+                          className="text-xs font-bold text-[#1b4332] hover:underline cursor-pointer"
                         >
-                          Try Another Photo / Reset
+                          {t('aiPage.tryAnotherPhoto')}
                         </button>
                       </div>
 
@@ -713,10 +672,10 @@ export default function DemoPage() {
                         <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 space-y-1">
                           <div className="flex items-center gap-2 text-xs font-bold text-amber-900">
                             <ShieldAlert className="w-4 h-4 text-[#d97706] shrink-0" />
-                            <span>Auto-Escalated to Agriculture Officer</span>
+                            <span>{t('aiPage.escalatedNoticeTitle')}</span>
                           </div>
                           <p className="text-xs font-medium text-amber-900 leading-relaxed">
-                            Computer vision confidence score is <strong>{scanAnswer.aiConfidence}%</strong> (below 80%). This crop leaf scan has been <strong>automatically sent</strong> to KVK Officer Dr. Sunita Sharma for field verification. Track status on your <Link to="/farmer-dashboard" className="underline font-bold text-[#1b4332]">Dashboard History</Link>.
+                            {t('aiPage.escalatedNoticeDesc')} View on <Link to="/farmer-dashboard" className="underline font-bold text-[#1b4332]">Dashboard History</Link>.
                           </p>
                         </div>
                       )}
@@ -730,19 +689,19 @@ export default function DemoPage() {
                           />
                           <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
                             <div className="bg-black/75 backdrop-blur-sm border-2 border-[#e9c46a] text-[#e9c46a] text-xs font-bold px-4 py-2 rounded-xl">
-                              AI Bounding Box Scan: {scanAnswer.aiConfidence}% Match
+                              {t('aiPage.matchScore')}: {scanAnswer.aiConfidence}%
                             </div>
                           </div>
                         </div>
 
                         <div className="md:col-span-7 space-y-3">
                           <div>
-                            <span className="text-xs font-bold uppercase text-gray-500 block mb-0.5">Submitted Question / Scan:</span>
+                            <span className="text-xs font-bold uppercase text-gray-500 block mb-0.5">{t('aiPage.submittedQuestion')}</span>
                             <p className="text-sm font-bold text-gray-900">"{scanAnswer.question}"</p>
                           </div>
 
                           <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
-                            <span className="text-xs font-bold text-amber-900 block mb-0.5">Identified Condition:</span>
+                            <span className="text-xs font-bold text-amber-900 block mb-0.5">{t('aiPage.identifiedCondition')}</span>
                             <span className="text-base font-bold text-amber-950">
                               {scanAnswer.aiDiagnosis || scanAnswer.diagnosis}
                             </span>
@@ -781,7 +740,7 @@ export default function DemoPage() {
                   <form onSubmit={handleSchemeSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <label className="block text-xs font-bold text-gray-900 uppercase">Select Government Scheme:</label>
+                        <label className="block text-xs font-bold text-gray-900 uppercase">{t('aiPage.schemeSelectLabel')}</label>
                         <select
                           value={selectedScheme}
                           onChange={(e) => setSelectedScheme(e.target.value)}
@@ -794,12 +753,12 @@ export default function DemoPage() {
                       </div>
 
                       <div className="space-y-1">
-                        <label className="block text-xs font-bold text-gray-900 uppercase">Enter Registration / Aadhaar No:</label>
+                        <label className="block text-xs font-bold text-gray-900 uppercase">{t('aiPage.idLabel')}</label>
                         <input
                           type="text"
                           value={farmerIdInput}
                           onChange={(e) => setFarmerIdInput(e.target.value)}
-                          placeholder="e.g. 9845-XXXX-1234 (Mock ID)"
+                          placeholder={t('aiPage.idPlaceholder')}
                           className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium text-gray-900"
                         />
                       </div>
@@ -808,17 +767,17 @@ export default function DemoPage() {
                     <button
                       type="submit"
                       disabled={isVerifyingScheme}
-                      className="w-full py-3.5 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] disabled:bg-gray-300 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all"
+                      className="w-full py-3.5 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] disabled:bg-gray-300 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
                     >
                       {isVerifyingScheme ? (
                         <>
                           <RefreshCw className="w-4 h-4 animate-spin" />
-                          <span>Verifying e-KYC Records...</span>
+                          <span>{t('aiPage.verifyingScheme')}</span>
                         </>
                       ) : (
                         <>
                           <Search className="w-4 h-4" />
-                          <span>Check Subsidy Status & Eligibility</span>
+                          <span>{t('aiPage.btnCheckScheme')}</span>
                         </>
                       )}
                     </button>
@@ -832,7 +791,7 @@ export default function DemoPage() {
                     >
                       <div className="flex items-center justify-between border-b border-gray-200 pb-2">
                         <h4 className="font-serif-display text-xl font-bold text-[#111827]">
-                          Subsidy Verification Result
+                          {t('aiPage.schemeResultTitle')}
                         </h4>
                         <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900">
                           AI Confidence: {schemeAnswer.aiConfidence}% (Resolved)
@@ -841,9 +800,9 @@ export default function DemoPage() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="p-4 rounded-2xl bg-[#faf8f5] border-2 border-emerald-300 space-y-1">
-                          <div className="text-xs text-gray-600 font-bold">PM-KISAN 17th Installment Status</div>
-                          <div className="text-base font-bold text-emerald-950">₹2,000 Credited via Direct Benefit Transfer</div>
-                          <div className="text-[11px] text-emerald-800 font-semibold">e-KYC Verified & Bank Account Linked</div>
+                          <div className="text-xs text-gray-600 font-bold">{schemeAnswer.statusTitle || 'PM-KISAN Status'}</div>
+                          <div className="text-base font-bold text-emerald-950">{schemeAnswer.statusDetail || schemeAnswer.remedy}</div>
+                          <div className="text-[11px] text-emerald-800 font-semibold">{schemeAnswer.statusSub || 'e-KYC Verified'}</div>
                         </div>
 
                         <div className="p-4 rounded-2xl bg-[#faf8f5] border-2 border-amber-300 space-y-1">
@@ -875,7 +834,7 @@ export default function DemoPage() {
             >
               <button
                 onClick={() => setShowAuthGateModal(false)}
-                className="absolute top-4 right-4 p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                className="absolute top-4 right-4 p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -886,17 +845,17 @@ export default function DemoPage() {
 
               <div className="space-y-2">
                 <h3 className="font-serif-display text-2xl font-bold text-gray-900">
-                  Sign In to Get Personalized Advice
+                  {t('aiPage.authGateTitle')}
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-600 font-body leading-relaxed">
-                  Create a free account to ask questions, save your advisory history, and get instant recommendations tailored to your specific crops and location.
+                  {t('aiPage.authGateDesc')}
                 </p>
               </div>
 
               <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs font-bold text-amber-900 text-left space-y-1">
-                <span className="block">💡 Testing Hackathon Demo?</span>
+                <span className="block">{t('aiPage.authGateNoticeTitle')}</span>
                 <span className="font-semibold block text-gray-700">
-                  Click "Sign In" below and use the <strong>1-Click Autofill Demo Login</strong> button!
+                  {t('aiPage.authGateNoticeDesc')}
                 </span>
               </div>
 
@@ -906,7 +865,7 @@ export default function DemoPage() {
                   className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-sm shadow-md"
                 >
                   <User className="w-4 h-4 text-[#e9c46a]" />
-                  <span>Sign In</span>
+                  <span>{t('navbar.signIn')}</span>
                 </Link>
 
                 <Link
@@ -914,7 +873,7 @@ export default function DemoPage() {
                   className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white hover:bg-gray-100 text-gray-900 font-bold text-sm border-2 border-gray-300 shadow-sm"
                 >
                   <UserPlus className="w-4 h-4 text-[#1b4332]" />
-                  <span>Create Free Account</span>
+                  <span>{t('aiPage.btnFreeAccount')}</span>
                 </Link>
               </div>
             </motion.div>

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Sprout, Lock, UserCheck, ArrowRight, KeyRound, Sparkles, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
+import { Sprout, UserCheck, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { loginFarmer, loginOfficer } from '../lib/auth';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const initialRole = searchParams.get('role') === 'officer' ? 'officer' : 'farmer';
   const redirectPath = searchParams.get('redirect') || '';
@@ -19,7 +21,6 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Role toggle switch handler
   const handleRoleChange = (newRole) => {
     setRole(newRole);
     setErrorMsg('');
@@ -27,13 +28,10 @@ export default function LoginPage() {
     setPassword('');
   };
 
-
-
-  // Form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!emailOrPhone.trim() || !password.trim()) {
-      setErrorMsg('Please enter both identifier and password.');
+      setErrorMsg('Please enter both credentials.');
       return;
     }
 
@@ -45,7 +43,7 @@ export default function LoginPage() {
         await loginFarmer({ phone: emailOrPhone.trim(), password });
       } else {
         if (!emailOrPhone.includes('@')) {
-          throw new Error('Please sign in with your official email address (Employee ID login is not supported yet).');
+          throw new Error('Please sign in with your official email address.');
         }
         await loginOfficer({ email: emailOrPhone.trim(), password });
       }
@@ -80,14 +78,14 @@ export default function LoginPage() {
               <Sprout className="w-5 h-5" />
             </div>
             <span className="font-serif-display text-2xl font-bold text-[#111827]">
-              Digital Krishi <span className="text-[#d97706]">Officer</span>
+              {t('navbar.brandName')}
             </span>
           </Link>
           <h1 className="font-serif-display text-xl font-bold text-gray-900 pt-1">
-            Welcome Back — Sign In
+            {t('auth.loginTitle')}
           </h1>
           <p className="text-xs text-gray-600 font-body">
-            Access personalized AI advice, crop diagnostics, and subsidy tracking.
+            {t('auth.loginSub')}
           </p>
         </div>
 
@@ -103,7 +101,7 @@ export default function LoginPage() {
             }`}
           >
             <Sprout className="w-3.5 h-3.5 text-[#e9c46a]" />
-            <span>Kisan / Farmer</span>
+            <span>{t('auth.farmerTab')}</span>
           </button>
 
           <button
@@ -116,11 +114,9 @@ export default function LoginPage() {
             }`}
           >
             <UserCheck className="w-3.5 h-3.5 text-[#e9c46a]" />
-            <span>Ag-Officer</span>
+            <span>{t('auth.officerTab')}</span>
           </button>
         </div>
-
-
 
         {/* Error Alert */}
         {errorMsg && (
@@ -134,13 +130,13 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
             <label className="block text-xs font-bold text-gray-900 uppercase">
-              {role === 'farmer' ? 'Mobile Number or Email' : 'Official Email or Employee ID'}
+              {role === 'farmer' ? t('auth.phoneLabel') : 'Official Email'}
             </label>
             <input
               type="text"
               value={emailOrPhone}
               onChange={(e) => setEmailOrPhone(e.target.value)}
-              placeholder={role === 'farmer' ? 'e.g. 9876543210 or farmer@demo.com' : 'e.g. officer@demo.com'}
+              placeholder={role === 'farmer' ? '9876543210' : 'officer@demo.com'}
               className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
               required
             />
@@ -148,8 +144,7 @@ export default function LoginPage() {
 
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold text-gray-900 uppercase">Password</label>
-              <span className="text-[11px] text-gray-500 font-medium">Demo: {role === 'farmer' ? 'farmer123' : 'officer123'}</span>
+              <label className="block text-xs font-bold text-gray-900 uppercase">{t('auth.passwordLabel')}</label>
             </div>
             <input
               type="password"
@@ -170,7 +165,7 @@ export default function LoginPage() {
               <span>Signing In...</span>
             ) : (
               <>
-                <span>Sign In as {role === 'farmer' ? 'Farmer' : 'Officer'}</span>
+                <span>{t('auth.btnLogin')}</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -179,12 +174,12 @@ export default function LoginPage() {
 
         {/* Footer link to Register */}
         <div className="pt-4 border-t border-gray-200 text-center text-xs text-gray-600 font-medium">
-          New to Digital Krishi Officer?{' '}
+          {t('auth.noAccount')}{' '}
           <Link
             to={`/register?role=${role}${redirectPath ? `&redirect=${encodeURIComponent(redirectPath)}` : ''}`}
             className="font-bold text-[#1b4332] hover:text-[#d97706] underline ml-1"
           >
-            Create a {role === 'farmer' ? 'Farmer' : 'Officer'} Account
+            {t('auth.btnRegister')}
           </Link>
         </div>
 

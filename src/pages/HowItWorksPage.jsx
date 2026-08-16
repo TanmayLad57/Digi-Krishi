@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
   HelpCircle,
@@ -14,39 +15,41 @@ import {
 } from 'lucide-react';
 
 export default function HowItWorksPage() {
+  const { t } = useTranslation();
+
   const steps = [
     {
-      number: '01',
-      title: 'Farmer Asks a Question',
+      number: t('howItWorks.s1Number'),
+      title: t('howItWorks.s1Title'),
       badge: 'Multi-Modal Input',
-      description: 'Speak in your local language, type a query in our Ask AI box, or snap a photo of infected leaves or soil using your smartphone.',
-      details: 'Supports Hindi, Marathi, Punjabi, Telugu, and English with voice audio synthesis.',
+      description: t('howItWorks.s1Desc'),
+      details: 'Supports English, Hindi, Marathi, and Malayalam voice & text.',
       icon: HelpCircle,
       color: 'bg-[#1b4332] text-white',
     },
     {
-      number: '02',
-      title: 'AI & Knowledge Base Analysis',
+      number: t('howItWorks.s2Number'),
+      title: t('howItWorks.s2Title'),
       badge: 'Agronomy AI Core',
-      description: 'Our engine cross-references your input against verified ICAR research, regional weather forecasts, and historical crop data.',
+      description: t('howItWorks.s2Desc'),
       details: 'Evaluates micro-climate temperature, humidity, and district-level soil health cards.',
       icon: Cpu,
       color: 'bg-[#d97706] text-white',
     },
     {
-      number: '03',
-      title: 'Instant Actionable Answer',
+      number: t('howItWorks.s3Number'),
+      title: t('howItWorks.s3Title'),
       badge: '24/7 Response',
-      description: 'Receive step-by-step remedies, precise spray dosage per acre, organic alternatives, and spray weather timing in simple language.',
+      description: t('howItWorks.s3Desc'),
       details: 'Clear organic solutions (Neem oil) alongside recommended scientific chemical dosages.',
       icon: CheckCircle2,
       color: 'bg-[#2d6a4f] text-white',
     },
     {
-      number: '04',
-      title: 'Human Officer Escalation',
+      number: t('howItWorks.s4Number'),
+      title: t('howItWorks.s4Title'),
       badge: 'Real Expert Backup',
-      description: 'If the diagnosis has edge-case complexity or confidence is under 90%, it is automatically routed to a local KVK extension officer.',
+      description: t('howItWorks.s4Desc'),
       details: 'Officer reviews crop photo & context, providing direct phone follow-up if needed.',
       icon: UserCheck,
       color: 'bg-[#c8553d] text-white',
@@ -61,13 +64,13 @@ export default function HowItWorksPage() {
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#1b4332]/10 text-[#1b4332] text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-4 h-4 text-[#d97706]" />
-            <span>Process Flow</span>
+            <span>{t('howItWorks.badge')}</span>
           </div>
           <h1 className="font-serif-display text-4xl sm:text-5xl font-bold text-[#111827]">
-            How Digital Krishi Officer Works
+            {t('howItWorks.title')}
           </h1>
           <p className="text-base sm:text-lg text-gray-700 font-body leading-relaxed">
-            From field observation to expert solution in seconds — combining AI speed with human officer accountability.
+            {t('howItWorks.subtext')}
           </p>
         </div>
 
@@ -122,7 +125,7 @@ export default function HowItWorksPage() {
               Backed by Verified Agricultural Intelligence
             </h3>
             <p className="text-sm text-gray-700">
-              Unlike generic chatbot models, Digital Krishi Officer is grounded in verified scientific datasets.
+              Unlike generic chatbot models, Krishi Sathi is grounded in verified scientific datasets.
             </p>
           </div>
 
@@ -151,7 +154,7 @@ export default function HowItWorksPage() {
               to="/demo"
               className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#1b4332] text-white font-bold text-sm hover:bg-[#2d6a4f] shadow-md"
             >
-              <span>Test How It Works in Demo</span>
+              <span>{t('navbar.getStarted')}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

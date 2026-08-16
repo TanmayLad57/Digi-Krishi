@@ -1,58 +1,61 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { HelpCircle, Cpu, CheckCircle2, UserCheck, ArrowRight, Sparkles } from 'lucide-react';
 
 export default function HowItWorks() {
+  const { t } = useTranslation();
+
   const steps = [
     {
-      number: '01',
-      title: 'Farmer Asks a Question',
-      description: 'Speak in your local language, type a query, or snap a photo of infected leaves or soil using your smartphone or WhatsApp.',
+      number: t('howItWorks.s1Number'),
+      title: t('howItWorks.s1Title'),
+      description: t('howItWorks.s1Desc'),
       icon: HelpCircle,
-      badge: 'Multi-Modal Input',
+      badge: 'Step 01',
       color: 'bg-[#2d6a4f]',
     },
     {
-      number: '02',
-      title: 'AI & Knowledge Base Analysis',
-      description: 'Our AI engine cross-references your question against verified ICAR research, regional weather forecasts, and historical crop data.',
+      number: t('howItWorks.s2Number'),
+      title: t('howItWorks.s2Title'),
+      description: t('howItWorks.s2Desc'),
       icon: Cpu,
-      badge: 'Agronomy AI Core',
+      badge: 'Step 02',
       color: 'bg-[#d97706]',
     },
     {
-      number: '03',
-      title: 'Instant Actionable Advice',
-      description: 'Receive step-by-step remedies, precise spray dosage, organic alternatives, and spray weather timing in simple language or voice.',
+      number: t('howItWorks.s3Number'),
+      title: t('howItWorks.s3Title'),
+      description: t('howItWorks.s3Desc'),
       icon: CheckCircle2,
-      badge: '24/7 Response',
+      badge: 'Step 03',
       color: 'bg-[#40916c]',
     },
     {
-      number: '04',
-      title: 'Human Officer Escalation',
-      description: 'If the diagnosis has edge-case complexity, it is automatically routed to a local Krishi Vigyan Kendra (KVK) extension officer for verification.',
+      number: t('howItWorks.s4Number'),
+      title: t('howItWorks.s4Title'),
+      description: t('howItWorks.s4Desc'),
       icon: UserCheck,
-      badge: 'Real Expert Safety Net',
+      badge: 'Step 04',
       color: 'bg-[#c8553d]',
     },
   ];
 
   return (
-    <section id="how-it-works" className="py-20 lg:py-28 bg-[#faf8f5] dark:bg-[#0c1813] transition-colors relative">
+    <section id="how-it-works" className="py-20 lg:py-28 bg-[#faf8f5] transition-colors relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#2d6a4f]/10 dark:bg-[#74c69d]/20 text-[#2d6a4f] dark:text-[#74c69d] text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#2d6a4f]/10 text-[#2d6a4f] text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-4 h-4 text-[#d97706]" />
-            <span>Simple 4-Step Process</span>
+            <span>{t('howItWorks.badge')}</span>
           </div>
-          <h2 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1b4332] dark:text-[#f3eee7]">
-            How Digital Krishi Officer Works
+          <h2 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1b4332]">
+            {t('howItWorks.title')}
           </h2>
-          <p className="text-base text-gray-700 dark:text-gray-300 font-body">
-            From field observation to expert solution in seconds — with human officer escalation for 100% peace of mind.
+          <p className="text-base text-gray-700 font-body">
+            {t('howItWorks.subtext')}
           </p>
         </div>
 
@@ -60,7 +63,7 @@ export default function HowItWorks() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
           
           {/* Decorative Connecting Horizontal Line for Desktop */}
-          <div className="hidden lg:block absolute top-1/2 left-12 right-12 h-0.5 bg-[#2d6a4f]/20 dark:bg-[#40916c]/30 -z-0 -translate-y-6" />
+          <div className="hidden lg:block absolute top-1/2 left-12 right-12 h-0.5 bg-[#2d6a4f]/20 -z-0 -translate-y-6" />
 
           {steps.map((step, index) => {
             const Icon = step.icon;
@@ -71,7 +74,7 @@ export default function HowItWorks() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.15 }}
                 viewport={{ once: true, margin: '-50px' }}
-                className="relative z-10 bg-white dark:bg-[#14271f] p-6 rounded-3xl border border-[#2d6a4f]/15 dark:border-[#40916c]/20 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                className="relative z-10 bg-white p-6 rounded-3xl border border-[#2d6a4f]/15 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
               >
                 <div className="space-y-4">
                   {/* Step Header Badge & Number */}
@@ -79,28 +82,28 @@ export default function HowItWorks() {
                     <div className={`w-12 h-12 rounded-2xl ${step.color} text-white flex items-center justify-center shadow-md`}>
                       <Icon className="w-6 h-6" />
                     </div>
-                    <span className="font-serif-display text-3xl font-bold text-gray-300 dark:text-gray-700">
+                    <span className="font-serif-display text-3xl font-bold text-gray-300">
                       {step.number}
                     </span>
                   </div>
 
-                  <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-[#d97706] dark:text-[#e9c46a]">
+                  <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-[#d97706]">
                     {step.badge}
                   </span>
 
                   {/* Title & Description */}
-                  <h3 className="font-serif-display text-xl font-bold text-[#1b4332] dark:text-[#f3eee7]">
+                  <h3 className="font-serif-display text-xl font-bold text-[#1b4332]">
                     {step.title}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-body">
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-body">
                     {step.description}
                   </p>
                 </div>
 
                 {/* Arrow connector hint for mobile/tablet */}
                 {index < steps.length - 1 && (
-                  <div className="lg:hidden pt-4 flex justify-center text-[#2d6a4f] dark:text-[#74c69d]">
+                  <div className="lg:hidden pt-4 flex justify-center text-[#2d6a4f]">
                     <ArrowRight className="w-5 h-5 rotate-90 md:rotate-0" />
                   </div>
                 )}

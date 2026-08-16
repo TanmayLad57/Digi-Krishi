@@ -58,7 +58,7 @@ export default function OfficerSidebar() {
             <Sprout className="w-4 h-4" />
           </div>
           <span className="font-serif-display text-lg font-bold text-[#f3eee7]">
-            Krishi <span className="text-[#e9c46a]">Officer</span>
+            Krishi <span className="text-[#e9c46a]">Sathi</span>
           </span>
         </Link>
 
@@ -130,7 +130,7 @@ export default function OfficerSidebar() {
           </div>
           <div>
             <span className="font-serif-display text-xl font-bold text-[#f3eee7] leading-none block">
-              Digital Krishi <span className="text-[#e9c46a]">Officer</span>
+              Krishi <span className="text-[#e9c46a]">Sathi</span>
             </span>
             <span className="text-[10px] uppercase font-bold tracking-wider text-[#74c69d]">
               Work Tool Portal

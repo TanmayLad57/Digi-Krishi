@@ -6,7 +6,10 @@ import { useAuth } from '../context/AuthContext';
 import { INDIA_STATES_DISTRICTS, POPULAR_CROPS } from '../data/locationData';
 import { registerFarmer, registerOfficer } from '../lib/auth';
 
+import { useTranslation } from 'react-i18next';
+
 export default function RegisterPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const initialRole = searchParams.get('role') === 'officer' ? 'officer' : 'farmer';
   const redirectPath = searchParams.get('redirect') || '';
@@ -108,16 +111,14 @@ export default function RegisterPage() {
               <Sprout className="w-5 h-5" />
             </div>
             <span className="font-serif-display text-2xl font-bold text-[#111827]">
-              Digital Krishi <span className="text-[#d97706]">Officer</span>
+              {t('navbar.brandName')}
             </span>
           </Link>
           <h1 className="font-serif-display text-xl font-bold text-gray-900">
-            Create Your Free Account
+            {t('auth.registerTitle')}
           </h1>
           <p className="text-xs text-gray-600 font-body">
-            {role === 'farmer'
-              ? 'Get personalized crop advisory & direct extension officer support'
-              : 'Access the officer extension portal & review farmer advisory cases'}
+            {t('auth.registerSub')}
           </p>
         </div>
 

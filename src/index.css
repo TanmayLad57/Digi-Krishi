@@ -58,3 +58,12 @@
 .focus-ring {
   @apply focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] focus:ring-offset-2;
 }
+
+/* Hard nuclear override to guarantee 100% full opacity on Hero text elements across all languages */
+.hero-badge,
+.hero-heading,
+.hero-subtext {
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
+}

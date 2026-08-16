@@ -1,44 +1,47 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Zap, Target, ShieldCheck, Languages, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Zap, Target, ShieldCheck, Languages, Sparkles } from 'lucide-react';
 
 export default function WhyUs() {
+  const { t } = useTranslation();
+
   const trustPoints = [
     {
       icon: Zap,
-      title: 'Instant & 24/7 Available',
-      description: 'No need to wait for office hours or travel miles to extension centers. Get instant solutions right when pests attack.',
-      color: 'text-[#d97706] dark:text-[#e9c46a]',
-      bg: 'bg-[#d97706]/10 dark:bg-[#e9c46a]/20',
+      title: t('whyUs.c1Title'),
+      description: t('whyUs.c1Desc'),
+      color: 'text-[#d97706]',
+      bg: 'bg-[#d97706]/10',
     },
     {
       icon: Target,
-      title: 'Personalized to Your Crops & Soil',
-      description: 'Advice isn’t generic — it adapts to your district weather, soil type, and exact crop growth stage.',
-      color: 'text-[#2d6a4f] dark:text-[#74c69d]',
-      bg: 'bg-[#2d6a4f]/10 dark:bg-[#74c69d]/20',
+      title: t('whyUs.c2Title'),
+      description: t('whyUs.c2Desc'),
+      color: 'text-[#2d6a4f]',
+      bg: 'bg-[#2d6a4f]/10',
     },
     {
       icon: ShieldCheck,
-      title: 'Backed by Real Agronomy Experts',
-      description: 'Engineered using verified ICAR research datasets and supported by local KVK extension officers for 100% reliability.',
-      color: 'text-[#c8553d] dark:text-[#f87171]',
-      bg: 'bg-[#c8553d]/10 dark:bg-[#c8553d]/20',
+      title: t('whyUs.c3Title'),
+      description: t('whyUs.c3Desc'),
+      color: 'text-[#c8553d]',
+      bg: 'bg-[#c8553d]/10',
     },
     {
       icon: Languages,
-      title: 'Voice-First in Your Local Language',
-      description: 'Designed for effortless accessibility — speak naturally in Hindi, Marathi, Punjabi, Telugu, and more soon.',
-      color: 'text-[#40916c] dark:text-[#74c69d]',
-      bg: 'bg-[#40916c]/10 dark:bg-[#40916c]/20',
+      title: t('whyUs.c4Title'),
+      description: t('whyUs.c4Desc'),
+      color: 'text-[#40916c]',
+      bg: 'bg-[#40916c]/10',
     },
   ];
 
   return (
-    <section id="why-us" className="py-20 lg:py-28 bg-[#f3eee7] dark:bg-[#14271f] transition-colors relative overflow-hidden">
+    <section id="why-us" className="py-20 lg:py-28 bg-[#f3eee7] transition-colors relative overflow-hidden">
       
       {/* Background glow circle */}
-      <div className="absolute top-1/2 left-0 w-80 h-80 bg-[#2d6a4f]/10 dark:bg-[#74c69d]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-0 w-80 h-80 bg-[#2d6a4f]/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
@@ -53,7 +56,7 @@ export default function WhyUs() {
               viewport={{ once: true }}
               className="relative mx-auto max-w-md lg:max-w-none"
             >
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-[#1c352b]">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
                 <img
                   src="/images/officer.png"
                   alt="Agriculture extension officer collaborating with farmer in field"
@@ -74,12 +77,12 @@ export default function WhyUs() {
           <div className="lg:col-span-7 space-y-8 text-left">
             
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2d6a4f]/10 dark:bg-[#74c69d]/20 text-[#2d6a4f] dark:text-[#74c69d] text-xs font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2d6a4f]/10 text-[#2d6a4f] text-xs font-bold uppercase tracking-wider">
                 <Sparkles className="w-3.5 h-3.5 text-[#d97706]" />
-                <span>Why Farmers Trust Us</span>
+                <span>{t('whyUs.badge')}</span>
               </div>
-              <h2 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1b4332] dark:text-[#f3eee7]">
-                Designed Specifically for Smart Indian Agriculture
+              <h2 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1b4332]">
+                {t('whyUs.title')}
               </h2>
             </div>
 
@@ -93,15 +96,15 @@ export default function WhyUs() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     viewport={{ once: true }}
-                    className="p-5 rounded-2xl bg-white dark:bg-[#0c1813] border border-[#2d6a4f]/15 dark:border-[#40916c]/20 shadow-sm hover:shadow-md transition-all space-y-2.5"
+                    className="p-5 rounded-2xl bg-white border border-[#2d6a4f]/15 shadow-sm hover:shadow-md transition-all space-y-2.5"
                   >
                     <div className={`w-10 h-10 rounded-xl ${point.bg} flex items-center justify-center`}>
                       <Icon className={`w-5 h-5 ${point.color}`} />
                     </div>
-                    <h3 className="font-serif-display text-lg font-bold text-[#1b4332] dark:text-[#f3eee7]">
+                    <h3 className="font-serif-display text-lg font-bold text-[#1b4332]">
                       {point.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-body">
+                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-body">
                       {point.description}
                     </p>
                   </motion.div>

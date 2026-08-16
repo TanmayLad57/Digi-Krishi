@@ -1,8 +1,10 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Mic, Camera, MessageSquare, ArrowRight, ShieldCheck, CheckCircle2, Sparkles, Sprout } from 'lucide-react';
 
 export default function Hero() {
+  const { t } = useTranslation();
+
   return (
     <section id="hero" className="relative pt-28 pb-16 lg:pt-36 lg:pb-28 overflow-hidden bg-earth-pattern">
       {/* Subtle organic gradient glows */}
@@ -16,119 +18,84 @@ export default function Hero() {
           <div className="lg:col-span-7 space-y-6 text-left">
             
             {/* Tagline Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2d6a4f]/10 dark:bg-[#40916c]/20 border border-[#2d6a4f]/20 dark:border-[#40916c]/30 text-[#1b4332] dark:text-[#74c69d] text-xs sm:text-sm font-semibold"
-            >
-              <Sparkles className="w-4 h-4 text-[#d97706] dark:text-[#e9c46a]" />
-              <span>AI-Powered Kisan Advisory — Instant & Expert Backed</span>
-            </motion.div>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2d6a4f]/10 border border-[#2d6a4f]/20 text-[#1b4332] text-xs sm:text-sm font-semibold">
+              <Sparkles className="w-4 h-4 text-[#d97706]" />
+              <span>{t('hero.badge')}</span>
+            </div>
 
             {/* Main Heading */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="font-serif-display text-4xl sm:text-5xl lg:text-6xl tracking-tight text-[#1b4332] dark:text-[#f3eee7] font-bold leading-[1.12]"
-            >
-              Your AI Agricultural Assistant,{' '}
-              <span className="relative inline-block text-[#d97706] dark:text-[#e9c46a]">
-                Anytime, Anywhere.
-                <svg className="absolute -bottom-2 left-0 w-full h-3 text-[#e9c46a]/60 dark:text-[#d97706]/60 -z-10" viewBox="0 0 100 20" preserveAspectRatio="none">
+            <h1 className="font-serif-display text-4xl sm:text-5xl lg:text-6xl tracking-tight text-[#1b4332] font-bold leading-[1.12]">
+              {t('hero.headlineMain')}{' '}
+              <span className="relative inline-block text-[#d97706]">
+                {t('hero.headlineHighlight')}
+                <svg className="absolute -bottom-2 left-0 w-full h-3 text-[#e9c46a]/60 -z-10" viewBox="0 0 100 20" preserveAspectRatio="none">
                   <path d="M0,15 Q50,0 100,15" stroke="currentColor" strokeWidth="4" fill="none" />
                 </svg>
               </span>
-            </motion.h1>
+            </h1>
 
             {/* Supporting Subtext */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg sm:text-xl text-gray-700 dark:text-gray-300 font-body max-w-2xl font-normal leading-relaxed"
-            >
-              Ask crop questions in your language via <span className="font-semibold text-[#1b4332] dark:text-[#74c69d]">Voice 🎙</span>, <span className="font-semibold text-[#1b4332] dark:text-[#74c69d]">Text 💬</span>, or <span className="font-semibold text-[#1b4332] dark:text-[#74c69d]">Crop Leaf Photo 📷</span>. Get instant, scientific recommendations tailored to your soil, weather, and district.
-            </motion.p>
+            <p className="text-lg sm:text-xl text-gray-700 font-body max-w-2xl font-normal leading-relaxed">
+              {t('hero.subtext')}
+            </p>
 
             {/* Core Interaction Modalities Chips */}
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.28 }}
-              className="flex flex-wrap gap-2.5 pt-1"
-            >
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/80 dark:bg-[#1c352b]/90 border border-gray-200 dark:border-[#40916c]/30 text-xs font-medium text-gray-700 dark:text-gray-200 shadow-sm">
+            <div className="flex flex-wrap gap-2.5 pt-1">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/80 border border-gray-200 text-xs font-medium text-gray-700 shadow-sm">
                 <Mic className="w-3.5 h-3.5 text-[#d97706]" />
-                <span>Voice Queries (Hindi / Local Dialects)</span>
+                <span>{t('hero.voiceChip')}</span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/80 dark:bg-[#1c352b]/90 border border-gray-200 dark:border-[#40916c]/30 text-xs font-medium text-gray-700 dark:text-gray-200 shadow-sm">
-                <Camera className="w-3.5 h-3.5 text-[#2d6a4f] dark:text-[#74c69d]" />
-                <span>Crop Photo AI Scanner</span>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/80 border border-gray-200 text-xs font-medium text-gray-700 shadow-sm">
+                <Camera className="w-3.5 h-3.5 text-[#2d6a4f]" />
+                <span>{t('hero.cameraChip')}</span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/80 dark:bg-[#1c352b]/90 border border-gray-200 dark:border-[#40916c]/30 text-xs font-medium text-gray-700 dark:text-gray-200 shadow-sm">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/80 border border-gray-200 text-xs font-medium text-gray-700 shadow-sm">
                 <MessageSquare className="w-3.5 h-3.5 text-[#c8553d]" />
-                <span>Smart WhatsApp & Web Chat</span>
+                <span>{t('hero.chatChip')}</span>
               </div>
-            </motion.div>
+            </div>
 
             {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.35 }}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-3"
-            >
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-3">
               <a
                 href="#interactive-demo"
-                className="inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] dark:bg-[#40916c] dark:hover:bg-[#74c69d] text-white dark:text-[#0c1813] font-semibold text-base shadow-lg shadow-[#1b4332]/25 dark:shadow-none hover:translate-y-[-2px] transition-all"
+                className="inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-semibold text-base shadow-lg shadow-[#1b4332]/25 hover:translate-y-[-2px] transition-all"
               >
-                <span>Get Started</span>
+                <span>{t('hero.btnGetStarted')}</span>
                 <ArrowRight className="w-5 h-5" />
               </a>
 
               <a
                 href="#how-it-works"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white dark:bg-[#1c352b] hover:bg-[#f3eee7] dark:hover:bg-[#254639] text-[#1b4332] dark:text-[#f3eee7] font-semibold text-base border border-[#2d6a4f]/20 dark:border-[#40916c]/30 shadow-sm hover:translate-y-[-1px] transition-all"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white hover:bg-[#f3eee7] text-[#1b4332] font-semibold text-base border border-[#2d6a4f]/20 shadow-sm hover:translate-y-[-1px] transition-all"
               >
-                <span>Learn More</span>
+                <span>{t('hero.btnLearnMore')}</span>
               </a>
-            </motion.div>
+            </div>
 
             {/* Trust metrics bar */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.45 }}
-              className="pt-6 border-t border-[#2d6a4f]/15 dark:border-[#40916c]/20 grid grid-cols-3 gap-4"
-            >
+            <div className="pt-6 border-t border-[#2d6a4f]/15 grid grid-cols-3 gap-4">
               <div>
-                <div className="font-serif-display text-2xl sm:text-3xl font-bold text-[#1b4332] dark:text-[#e9c46a]">50k+</div>
-                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">Farmer Queries Solved</div>
+                <div className="font-serif-display text-2xl sm:text-3xl font-bold text-[#1b4332]">{t('hero.statQueries')}</div>
+                <div className="text-xs text-gray-600 font-medium">{t('hero.statQueriesLabel')}</div>
               </div>
               <div>
-                <div className="font-serif-display text-2xl sm:text-3xl font-bold text-[#2d6a4f] dark:text-[#74c69d]">98.4%</div>
-                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">Diagnostic Accuracy</div>
+                <div className="font-serif-display text-2xl sm:text-3xl font-bold text-[#2d6a4f]">{t('hero.statAccuracy')}</div>
+                <div className="text-xs text-gray-600 font-medium">{t('hero.statAccuracyLabel')}</div>
               </div>
               <div>
-                <div className="font-serif-display text-2xl sm:text-3xl font-bold text-[#d97706] dark:text-[#e9c46a]">100%</div>
-                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">Free & Expert-Backed</div>
+                <div className="font-serif-display text-2xl sm:text-3xl font-bold text-[#d97706]">{t('hero.statFree')}</div>
+                <div className="text-xs text-gray-600 font-medium">{t('hero.statFreeLabel')}</div>
               </div>
-            </motion.div>
+            </div>
 
           </div>
 
           {/* Right Column: Hero Visual & Floating AI Advisory Cards */}
           <div className="lg:col-span-5 relative">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="relative mx-auto max-w-md lg:max-w-none"
-            >
+            <div className="relative mx-auto max-w-md lg:max-w-none">
               {/* Main Image Frame */}
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-[#1c352b] bg-[#1b4332]/5">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-[#1b4332]/5">
                 <img
                   src="/images/hero.png"
                   alt="Indian farmer holding smartphone in green field with AI technology overlay"
@@ -139,22 +106,22 @@ export default function Hero() {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#132a22]/80 via-transparent to-transparent" />
                 
                 {/* Bottom Card Overlay inside image */}
-                <div className="absolute bottom-4 left-4 right-4 bg-white/95 dark:bg-[#14271f]/95 backdrop-blur-md p-4 rounded-2xl border border-[#2d6a4f]/20 shadow-xl">
+                <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-[#2d6a4f]/20 shadow-xl">
                   <div className="flex items-start gap-3">
                     <div className="w-9 h-9 rounded-xl bg-[#2d6a4f] flex items-center justify-center text-white shrink-0 mt-0.5">
                       <Sprout className="w-5 h-5 text-[#e9c46a]" />
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#d97706] dark:text-[#e9c46a]">Live AI Diagnosis</span>
-                        <span className="text-[10px] text-gray-500 dark:text-gray-400">Just Now • Vidarbha</span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#d97706]">{t('hero.liveBadge')}</span>
+                        <span className="text-[10px] text-gray-500">{t('hero.liveTime')}</span>
                       </div>
-                      <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        "Yellow leaf spots on cotton crop identified as Leaf Rust."
+                      <p className="text-xs sm:text-sm font-semibold text-gray-900">
+                        {t('hero.liveQuery')}
                       </p>
-                      <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#2d6a4f] dark:text-[#74c69d]">
+                      <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#2d6a4f]">
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Recommended organic fungicide dosage sent in Hindi voice note</span>
+                        <span>{t('hero.liveAction')}</span>
                       </div>
                     </div>
                   </div>
@@ -162,21 +129,17 @@ export default function Hero() {
               </div>
 
               {/* Top Floating Badge */}
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                className="absolute -top-5 -left-4 sm:-left-6 bg-white dark:bg-[#1c352b] px-4 py-2.5 rounded-2xl shadow-xl border border-[#2d6a4f]/20 dark:border-[#40916c]/30 flex items-center gap-3"
-              >
-                <div className="w-8 h-8 rounded-full bg-[#d97706]/15 flex items-center justify-center text-[#d97706] dark:text-[#e9c46a]">
+              <div className="absolute -top-5 -left-4 sm:-left-6 bg-white px-4 py-2.5 rounded-2xl shadow-xl border border-[#2d6a4f]/20 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-[#d97706]/15 flex items-center justify-center text-[#d97706]">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-gray-900 dark:text-gray-100">ICAR Knowledge Base</div>
-                  <div className="text-[10px] text-gray-600 dark:text-gray-400">Verified by Ag-Officers</div>
+                  <div className="text-xs font-bold text-gray-900">{t('hero.trustTitle')}</div>
+                  <div className="text-[10px] text-gray-600">{t('hero.trustSub')}</div>
                 </div>
-              </motion.div>
+              </div>
 
-            </motion.div>
+            </div>
           </div>
 
         </div>

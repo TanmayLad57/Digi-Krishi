@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sprout,
@@ -17,16 +18,26 @@ import {
   PlayCircle,
   User,
   LogOut,
-  LayoutDashboard
+  LayoutDashboard,
+  Globe
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+const LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'hi', label: 'हिंदी' },
+  { code: 'mr', label: 'मराठी' },
+  { code: 'ml', label: 'മലയാളം' }
+];
+
 export default function Navbar() {
+  const { t, i18n } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, isAuthenticated, logout } = useAuth();
@@ -44,6 +55,7 @@ export default function Navbar() {
   useEffect(() => {
     setActiveDropdown(null);
     setUserDropdownOpen(false);
+    setLangDropdownOpen(false);
     setMobileMenuOpen(false);
     window.scrollTo(0, 0);
   }, [location.pathname]);
@@ -65,44 +77,56 @@ export default function Navbar() {
     navigate('/');
   };
 
+  const handleLanguageChange = (code) => {
+    i18n.changeLanguage(code);
+    localStorage.setItem('hasSelectedLanguage', 'true');
+    setLangDropdownOpen(false);
+  };
+
+  const currentLangObj = LANGUAGES.find((l) => l.code === (i18n.language || 'en').split('-')[0]) || LANGUAGES[0];
+
   const navStructure = [
     {
-      name: 'Home',
+      name: t('navbar.home'),
+      key: 'Home',
       path: '/',
       subLinks: [
-        { title: 'Hero & Overview', desc: 'Main platform intro', path: '/' },
-        { title: 'Platform Stats', desc: '50k+ queries solved', path: '/' },
-        { title: 'Capabilities Grid', desc: 'Explore all 5 features', path: '/' },
+        { title: t('navbar.heroOverview'), desc: t('navbar.heroOverviewDesc'), path: '/' },
+        { title: t('navbar.platformStats'), desc: t('navbar.platformStatsDesc'), path: '/' },
+        { title: t('navbar.capabilitiesGrid'), desc: t('navbar.capabilitiesGridDesc'), path: '/' },
       ]
     },
     {
-      name: 'AI',
+      name: t('navbar.ai'),
+      key: 'AI',
       path: '/demo',
       subLinks: [
-        { title: 'Ask AI (Text Input)', desc: 'Type custom crop question', path: '/demo', icon: MessageSquareText },
-        { title: 'Voice Query (Hindi)', desc: 'Audio input & response', path: '/demo', icon: PlayCircle },
-        { title: 'Crop Disease Scanner', desc: 'Photo diagnostic preview', path: '/demo', icon: Scan },
-        { title: 'Subsidy Status Checker', desc: 'PM-KISAN verification', path: '/demo', icon: Landmark },
+        { title: t('navbar.textAiTitle'), desc: t('navbar.textAiDesc'), path: '/demo', icon: MessageSquareText },
+        { title: t('navbar.voiceTitle'), desc: t('navbar.voiceDesc'), path: '/demo', icon: PlayCircle },
+        { title: t('navbar.scanTitle'), desc: t('navbar.scanDesc'), path: '/demo', icon: Scan },
+        { title: t('navbar.schemeTitle'), desc: t('navbar.schemeDesc'), path: '/demo', icon: Landmark },
       ]
     },
     {
-      name: 'How It Works',
+      name: t('navbar.howItWorks'),
+      key: 'HowItWorks',
       path: '/how-it-works',
       subLinks: [
-        { title: '01. Ask Question', desc: 'Photo, voice, or text', path: '/how-it-works', icon: HelpCircle },
-        { title: '02. AI Analysis', desc: 'ICAR research database', path: '/how-it-works', icon: Sparkles },
-        { title: '03. Actionable Advice', desc: 'Dosage & spray timing', path: '/how-it-works', icon: ShieldCheck },
-        { title: '04. Expert Escalation', desc: 'KVK officer review', path: '/how-it-works', icon: UserCheck },
+        { title: t('navbar.step1Title'), desc: t('navbar.step1Desc'), path: '/how-it-works', icon: HelpCircle },
+        { title: t('navbar.step2Title'), desc: t('navbar.step2Desc'), path: '/how-it-works', icon: Sparkles },
+        { title: t('navbar.step3Title'), desc: t('navbar.step3Desc'), path: '/how-it-works', icon: ShieldCheck },
+        { title: t('navbar.step4Title'), desc: t('navbar.step4Desc'), path: '/how-it-works', icon: UserCheck },
       ]
     },
     {
-      name: 'Why Us',
+      name: t('navbar.whyUs'),
+      key: 'WhyUs',
       path: '/why-us',
       subLinks: [
-        { title: 'Instant 24/7 Advice', desc: 'No office queues', path: '/why-us' },
-        { title: 'Personalized to Soil', desc: 'District-specific data', path: '/why-us' },
-        { title: 'Backed by Real Experts', desc: 'ICAR agronomy dataset', path: '/why-us' },
-        { title: 'Native Language', desc: 'Voice-first in Hindi/Marathi', path: '/why-us' },
+        { title: t('navbar.why1Title'), desc: t('navbar.why1Desc'), path: '/why-us' },
+        { title: t('navbar.why2Title'), desc: t('navbar.why2Desc'), path: '/why-us' },
+        { title: t('navbar.why3Title'), desc: t('navbar.why3Desc'), path: '/why-us' },
+        { title: t('navbar.why4Title'), desc: t('navbar.why4Desc'), path: '/why-us' },
       ]
     },
   ];
@@ -125,10 +149,10 @@ export default function Navbar() {
             </div>
             <div className="flex flex-col">
               <span className="font-serif-display text-xl sm:text-2xl font-bold tracking-tight text-[#111827] leading-none">
-                Digital Krishi <span className="text-[#d97706]">Officer</span>
+                {t('navbar.brandName')}
               </span>
               <span className="text-[10px] uppercase font-bold tracking-wider text-[#1b4332]">
-                AI Agricultural Advisory
+                {t('navbar.brandTagline')}
               </span>
             </div>
           </Link>
@@ -137,13 +161,13 @@ export default function Navbar() {
           <nav className="hidden lg:flex items-center gap-1 bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm">
             {navStructure.map((item) => {
               const isActive = location.pathname === item.path;
-              const isDropdownOpen = activeDropdown === item.name;
+              const isDropdownOpen = activeDropdown === item.key;
 
               return (
                 <div
-                  key={item.name}
+                  key={item.key}
                   className="relative"
-                  onMouseEnter={() => handleMouseEnter(item.name)}
+                  onMouseEnter={() => handleMouseEnter(item.key)}
                   onMouseLeave={handleMouseLeave}
                 >
                   <NavLink
@@ -173,7 +197,7 @@ export default function Navbar() {
                         className="absolute left-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-xl border border-gray-200 p-2 z-50"
                       >
                         <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 px-3 py-1 border-b border-gray-100 mb-1">
-                          {item.name} Sections
+                          {item.name} {t('navbar.sections')}
                         </div>
                         {item.subLinks.map((sub, idx) => {
                           const SubIcon = sub.icon;
@@ -210,13 +234,58 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Desktop Right Action: Auth User Badge or Sign In Button */}
+          {/* Desktop Right Action: Language Selector + Auth Badge */}
           <div className="hidden lg:flex items-center gap-3">
+            
+            {/* Language Switcher Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setLangDropdownOpen(!langDropdownOpen);
+                  setUserDropdownOpen(false);
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-gray-100 border border-gray-300 text-gray-800 font-bold text-xs shadow-sm transition-all cursor-pointer"
+                title="Select Language"
+              >
+                <Globe className="w-4 h-4 text-[#1b4332]" />
+                <span>{currentLangObj.label}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
+              </button>
+
+              <AnimatePresence>
+                {langDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    className="absolute right-0 top-full mt-2 w-36 bg-white rounded-2xl shadow-xl border border-gray-200 p-1.5 z-50 space-y-0.5"
+                  >
+                    {LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => handleLanguageChange(lang.code)}
+                        className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-colors ${
+                          currentLangObj.code === lang.code
+                            ? 'bg-[#1b4332] text-white'
+                            : 'text-gray-800 hover:bg-gray-100'
+                        }`}
+                      >
+                        {lang.label}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             {isAuthenticated ? (
               /* User Logged In Dropdown */
               <div className="relative">
                 <button
-                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  onClick={() => {
+                    setUserDropdownOpen(!userDropdownOpen);
+                    setLangDropdownOpen(false);
+                  }}
                   className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white border border-gray-300 hover:border-[#1b4332] shadow-sm transition-all"
                 >
                   <div className="w-7 h-7 rounded-full bg-[#1b4332] text-[#e9c46a] font-bold text-xs flex items-center justify-center">
@@ -227,7 +296,7 @@ export default function Navbar() {
                       {currentUser.name}
                     </span>
                     <span className="block text-[10px] uppercase font-bold text-[#d97706]">
-                      {currentUser.role === 'officer' ? 'Ag-Officer' : 'Kisan'}
+                      {currentUser.role === 'officer' ? t('navbar.officerRole') : t('navbar.kisanRole')}
                     </span>
                   </div>
                   <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
@@ -246,7 +315,7 @@ export default function Navbar() {
                         <div className="text-xs font-bold text-gray-900">{currentUser.name}</div>
                         <div className="text-[11px] text-gray-500">{currentUser.email || currentUser.phone}</div>
                         <span className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900">
-                          {currentUser.role === 'officer' ? 'Extension Officer' : 'Kisan Farmer'}
+                          {currentUser.role === 'officer' ? t('navbar.officerRole') : t('navbar.kisanRole')}
                         </span>
                       </div>
 
@@ -257,7 +326,7 @@ export default function Navbar() {
                           className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-100 text-xs font-bold text-gray-800"
                         >
                           <LayoutDashboard className="w-4 h-4 text-[#1b4332]" />
-                          <span>My Dashboard</span>
+                          <span>{t('navbar.myDashboard')}</span>
                         </Link>
 
                         <Link
@@ -266,7 +335,7 @@ export default function Navbar() {
                           className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-100 text-xs font-bold text-gray-800"
                         >
                           <Sparkles className="w-4 h-4 text-[#d97706]" />
-                          <span>AI Advisory Simulator</span>
+                          <span>{t('navbar.aiSimulator')}</span>
                         </Link>
                       </div>
 
@@ -275,36 +344,72 @@ export default function Navbar() {
                         className="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-red-50 text-xs font-bold text-red-700 border-t border-gray-100"
                       >
                         <LogOut className="w-4 h-4 text-red-600" />
-                        <span>Sign Out</span>
+                        <span>{t('navbar.signOut')}</span>
                       </button>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
             ) : (
-              /* User Logged Out Button */
+              /* User Logged Out Buttons */
               <div className="flex items-center gap-2">
                 <Link
                   to="/login?role=farmer"
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-gray-800 hover:text-[#1b4332] hover:bg-gray-100 border border-gray-300"
                 >
                   <User className="w-3.5 h-3.5 text-[#1b4332]" />
-                  <span>Sign In</span>
+                  <span>{t('navbar.signIn')}</span>
                 </Link>
 
                 <Link
                   to="/demo"
                   className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-[#e9c46a] font-bold text-xs shadow-md"
                 >
-                  <span>Get Started</span>
+                  <span>{t('navbar.getStarted')}</span>
                   <ArrowRight className="w-3.5 h-3.5 text-white" />
                 </Link>
               </div>
             )}
           </div>
 
-          {/* Mobile Hamburger Button */}
+          {/* Mobile Right Controls: Language Selector + Hamburger */}
           <div className="flex lg:hidden items-center gap-2">
+            {/* Mobile Language Selector Pill */}
+            <div className="relative">
+              <button
+                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-gray-300 text-xs font-bold text-gray-800"
+              >
+                <Globe className="w-3.5 h-3.5 text-[#1b4332]" />
+                <span>{currentLangObj.label}</span>
+              </button>
+
+              <AnimatePresence>
+                {langDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    className="absolute right-0 top-full mt-2 w-32 bg-white rounded-xl shadow-xl border border-gray-200 p-1 z-50 space-y-0.5"
+                  >
+                    {LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => handleLanguageChange(lang.code)}
+                        className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-bold ${
+                          currentLangObj.code === lang.code
+                            ? 'bg-[#1b4332] text-white'
+                            : 'text-gray-800 hover:bg-gray-100'
+                        }`}
+                      >
+                        {lang.label}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             {isAuthenticated ? (
               <Link
                 to={currentUser.role === 'officer' ? '/officer-dashboard' : '/farmer-dashboard'}
@@ -314,7 +419,7 @@ export default function Navbar() {
               </Link>
             ) : (
               <Link to="/login" className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#1b4332] text-white">
-                Sign In
+                {t('navbar.signIn')}
               </Link>
             )}
 
@@ -340,7 +445,7 @@ export default function Navbar() {
             className="lg:hidden bg-white border-b border-gray-200 px-4 pt-3 pb-6 space-y-4 shadow-xl"
           >
             {navStructure.map((item) => (
-              <div key={item.name} className="space-y-1">
+              <div key={item.key} className="space-y-1">
                 <Link
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
@@ -362,13 +467,13 @@ export default function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#1b4332] text-white font-bold text-sm"
                 >
-                  <span>My Dashboard</span>
+                  <span>{t('navbar.myDashboard')}</span>
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="w-full text-center py-2 text-xs font-bold text-red-600"
                 >
-                  Sign Out
+                  {t('navbar.signOut')}
                 </button>
               </div>
             ) : (
@@ -378,7 +483,7 @@ export default function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-[#1b4332] text-[#e9c46a] font-bold text-sm shadow-md"
                 >
-                  <span>Sign In / Create Account</span>
+                  <span>{t('navbar.signIn')}</span>
                 </Link>
               </div>
             )}

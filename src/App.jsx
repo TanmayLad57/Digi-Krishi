@@ -1,6 +1,5 @@
 import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
 
 import { supabase } from './lib/supabaseClient';
 import { AuthProvider } from './context/AuthContext';
@@ -8,6 +7,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import OfficerRouteGuard from './components/OfficerRouteGuard';
 import OfficerLayout from './components/OfficerLayout';
+import LanguageSelectionOverlay from './components/LanguageSelectionOverlay';
 
 import HomePage from './pages/HomePage';
 import DemoPage from './pages/DemoPage';
@@ -29,39 +29,31 @@ function AnimatedRoutes() {
       {/* Hide marketing Navbar & Footer when inside Officer Work Tool Workspace */}
       {!isOfficerWorkspace && <Navbar />}
 
-      <main className="flex-grow">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={location.pathname}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Routes location={location}>
-              {/* Public Marketing Routes */}
-              <Route path="/" element={<HomePage />} />
-              <Route path="/demo" element={<DemoPage />} />
-              <Route path="/how-it-works" element={<HowItWorksPage />} />
-              <Route path="/why-us" element={<WhyUsPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/farmer-dashboard" element={<FarmerDashboardPage />} />
+      <main className="flex-grow" style={{ opacity: 1, visibility: 'visible' }}>
+        <div key={location.pathname} style={{ opacity: 1, visibility: 'visible' }}>
+          <Routes location={location}>
+            {/* Public Marketing Routes */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/demo" element={<DemoPage />} />
+            <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/why-us" element={<WhyUsPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/farmer-dashboard" element={<FarmerDashboardPage />} />
 
-              {/* Protected Agriculture Officer Work Tool Section */}
-              <Route element={<OfficerRouteGuard />}>
-                <Route path="/officer-dashboard" element={<OfficerLayout />}>
-                  <Route index element={<OfficerDashboardPage />} />
-                  <Route path="cases" element={<OfficerCasesPage />} />
-                  <Route path="cases/:caseId" element={<OfficerCaseDetailPage />} />
-                </Route>
+            {/* Protected Agriculture Officer Work Tool Section */}
+            <Route element={<OfficerRouteGuard />}>
+              <Route path="/officer-dashboard" element={<OfficerLayout />}>
+                <Route index element={<OfficerDashboardPage />} />
+                <Route path="cases" element={<OfficerCasesPage />} />
+                <Route path="cases/:caseId" element={<OfficerCaseDetailPage />} />
               </Route>
+            </Route>
 
-              {/* Fallback */}
-              <Route path="*" element={<HomePage />} />
-            </Routes>
-          </motion.div>
-        </AnimatePresence>
+            {/* Fallback */}
+            <Route path="*" element={<HomePage />} />
+          </Routes>
+        </div>
       </main>
 
       {!isOfficerWorkspace && <Footer />}
@@ -74,6 +66,7 @@ export default function App() {
 
   return (
     <AuthProvider>
+      <LanguageSelectionOverlay />
       <AnimatedRoutes />
     </AuthProvider>
   );

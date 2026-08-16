@@ -1,6 +1,6 @@
-# 🌾 Digital Krishi Officer — AI Agricultural Advisory Platform
+# 🌾 Krishi Sathi — AI Agricultural Advisory Platform
 
-**Digital Krishi Officer** is an AI-powered agricultural advisory platform built for the Smart India Hackathon (SIH), designed to act as a digital agricultural assistant for farmers.
+**Krishi Sathi** is an AI-powered agricultural advisory platform built for the Smart India Hackathon (SIH), designed to act as a digital agricultural assistant for farmers.
 
 Farmers can ask questions about pests, diseases, weather, farming practices, inputs, and government subsidies — via text, voice, or crop photos — and receive instant, context-aware guidance. When the AI is uncertain, cases are escalated to a human Agriculture Officer, ensuring every farmer gets a trustworthy answer.
 

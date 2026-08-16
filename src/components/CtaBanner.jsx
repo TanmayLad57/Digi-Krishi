@@ -1,10 +1,13 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Sprout, ArrowRight, Award, ShieldCheck, Sparkles } from 'lucide-react';
 
 export default function CtaBanner() {
+  const { t } = useTranslation();
+
   return (
-    <section className="py-16 lg:py-24 bg-[#faf8f5] dark:bg-[#0c1813] transition-colors relative">
+    <section className="py-16 lg:py-24 bg-[#faf8f5] transition-colors relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <motion.div
@@ -23,36 +26,36 @@ export default function CtaBanner() {
             {/* Hackathon Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e9c46a]/20 border border-[#e9c46a]/30 text-[#e9c46a] text-xs font-bold uppercase tracking-wider">
               <Award className="w-4 h-4" />
-              <span>Built for Smart India Hackathon Prototype</span>
+              <span>Digital Krishi Platform</span>
             </div>
 
             {/* Main CTA Heading */}
             <h2 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#f3eee7]">
-              Join Thousands of Farmers Getting Smarter, Higher Yields Today
+              {t('cta.title')}
             </h2>
 
             {/* Subtext */}
             <p className="text-base sm:text-lg text-gray-200 font-body max-w-2xl mx-auto leading-relaxed">
-              Empower your field with 24/7 AI agricultural advisory. Free for every kisan across India with instant Hindi, Marathi & voice support.
+              {t('cta.subtext')}
             </p>
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               <motion.a
-                href="#interactive-demo"
+                href="/demo"
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-[#e9c46a] hover:bg-[#f59e0b] text-[#1b4332] font-bold text-base shadow-xl transition-all"
               >
-                <span>Get Started Now</span>
+                <span>{t('cta.btnAsk')}</span>
                 <ArrowRight className="w-5 h-5" />
               </motion.a>
 
               <a
-                href="#features"
+                href="/register"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold text-base border border-white/20 backdrop-blur-sm transition-all"
               >
-                <span>Explore Capabilities</span>
+                <span>{t('cta.btnRegister')}</span>
               </a>
             </div>
 
@@ -68,7 +71,7 @@ export default function CtaBanner() {
               </span>
               <span className="flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-[#e9c46a]" />
-                No App Download Required
+                Voice & Multilingual AI
               </span>
             </div>
 
