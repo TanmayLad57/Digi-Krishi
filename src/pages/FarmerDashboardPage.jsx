@@ -16,7 +16,7 @@ import {
   Clock
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getFarmerHistory } from '../data/mockCases';
+import { getFarmerQueries } from '../lib/queries';
 
 export default function FarmerDashboardPage() {
   const { t } = useTranslation();
@@ -25,8 +25,11 @@ export default function FarmerDashboardPage() {
   const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
-    setHistory(getFarmerHistory());
-  }, []);
+    if (!currentUser?.id) return;
+    getFarmerQueries(currentUser.id, currentUser.primaryCrop || currentUser.crops?.[0])
+      .then(setHistory)
+      .catch((error) => console.error('Unable to load query history', error));
+  }, [currentUser]);
 
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);

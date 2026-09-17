@@ -16,7 +16,7 @@ import {
   MapPin
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getStoredCases } from '../data/mockCases';
+import { getOfficerQueries } from '../lib/queries';
 
 export default function OfficerDashboardPage() {
   const { currentUser } = useAuth();
@@ -24,7 +24,9 @@ export default function OfficerDashboardPage() {
   const [cases, setCases] = useState([]);
 
   useEffect(() => {
-    setCases(getStoredCases());
+    getOfficerQueries()
+      .then(setCases)
+      .catch((error) => console.error('Unable to load escalated queries', error));
   }, []);
 
   const pendingCount = cases.filter((c) => c.status === 'Pending').length;

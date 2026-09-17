@@ -23,7 +23,7 @@ import {
   UserPlus
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { recordFarmerQuery } from '../data/mockCases';
+import { createQuery } from '../lib/queries';
 import { getMockResponses } from '../data/mockResponses';
 
 export default function DemoPage() {
@@ -73,6 +73,20 @@ export default function DemoPage() {
 
   const samplePrompts = mockData.samplePrompts || [];
 
+  const persistQuery = async (data, mode) => {
+    const confidence = Number(data.aiConfidence ?? 0);
+    await createQuery({
+      farmerId: currentUser.id,
+      mode,
+      question: data.question || data.query,
+      response: [data.aiDiagnosis, data.remedy, data.weatherAlert].filter(Boolean).join('\n\n'),
+      confidence,
+      language: currentLang,
+      imageUrl: data.photoUrl,
+    });
+    return confidence < 80;
+  };
+
   // Submit Text AI Query
   const handleTextSubmit = (queryToSubmit) => {
     const q = (queryToSubmit || userQuery || '').trim();
@@ -82,7 +96,7 @@ export default function DemoPage() {
       setUserQuery(q);
       setIsAnalyzingText(true);
 
-      setTimeout(() => {
+      setTimeout(async () => {
         setIsAnalyzingText(false);
         setTextSubmitted(true);
 
@@ -115,11 +129,13 @@ export default function DemoPage() {
           query: q,
         };
 
-        const { isEscalated } = recordFarmerQuery({
-          ...answerData,
-          farmerName: currentUser?.name || 'Rajesh Patil',
-          farmerPhone: currentUser?.phone || '9876543210',
-        });
+        let isEscalated = false;
+        try {
+          isEscalated = await persistQuery(answerData, 'text');
+        } catch (error) {
+          console.error('Unable to save query', error);
+          alert('AI answer is ready, but it could not be saved to your query history. Please try again.');
+        }
 
         setActiveAnswer({
           ...answerData,
@@ -140,17 +156,18 @@ export default function DemoPage() {
           if (prev <= 1) {
             clearInterval(interval);
             setVoiceState('processing');
-            setTimeout(() => {
+            setTimeout(async () => {
               setVoiceState('done');
               const vData = {
                 ...mockData.voiceQuery
               };
 
-              const { isEscalated } = recordFarmerQuery({
-                ...vData,
-                farmerName: currentUser?.name || 'Rajesh Patil',
-                farmerPhone: currentUser?.phone || '9876543210',
-              });
+              let isEscalated = false;
+              try {
+                isEscalated = await persistQuery(vData, 'voice');
+              } catch (error) {
+                console.error('Unable to save query', error);
+              }
 
               setVoiceAnswer({ ...vData, isEscalated });
             }, 1200);
@@ -167,18 +184,19 @@ export default function DemoPage() {
     checkAuthOrGate(() => {
       if (e.target.files && e.target.files[0]) {
         setVoiceState('processing');
-        setTimeout(() => {
+        setTimeout(async () => {
           setVoiceState('done');
           const vData = {
             ...mockData.voiceQuery,
             queryType: 'Voice Query (Uploaded Audio)',
           };
 
-          const { isEscalated } = recordFarmerQuery({
-            ...vData,
-            farmerName: currentUser?.name || 'Rajesh Patil',
-            farmerPhone: currentUser?.phone || '9876543210',
-          });
+          let isEscalated = false;
+          try {
+            isEscalated = await persistQuery(vData, 'voice');
+          } catch (error) {
+            console.error('Unable to save query', error);
+          }
 
           setVoiceAnswer({ ...vData, isEscalated });
         }, 1200);
@@ -192,18 +210,19 @@ export default function DemoPage() {
       setScannedImage(imageSrc);
       setScanState('scanning');
 
-      setTimeout(() => {
+      setTimeout(async () => {
         setScanState('done');
         const sData = {
           ...mockData.scanQuery,
           photoUrl: imageSrc,
         };
 
-        const { isEscalated } = recordFarmerQuery({
-          ...sData,
-          farmerName: currentUser?.name || 'Rajesh Patil',
-          farmerPhone: currentUser?.phone || '9876543210',
-        });
+        let isEscalated = false;
+        try {
+          isEscalated = await persistQuery(sData, 'image');
+        } catch (error) {
+          console.error('Unable to save query', error);
+        }
 
         setScanAnswer({ ...sData, isEscalated });
       }, 1500);
@@ -224,7 +243,7 @@ export default function DemoPage() {
     checkAuthOrGate(() => {
       setIsVerifyingScheme(true);
 
-      setTimeout(() => {
+      setTimeout(async () => {
         setIsVerifyingScheme(false);
         setSchemeSubmitted(true);
         const schemeObj = mockData.schemes[selectedScheme] || mockData.schemes['pm-kisan'];
@@ -235,11 +254,12 @@ export default function DemoPage() {
           query: `${schemeObj.query} (${farmerIdInput || 'Mock Aadhaar'})`,
         };
 
-        const { isEscalated } = recordFarmerQuery({
-          ...schData,
-          farmerName: currentUser?.name || 'Rajesh Patil',
-          farmerPhone: currentUser?.phone || '9876543210',
-        });
+        let isEscalated = false;
+        try {
+          isEscalated = await persistQuery(schData, 'scheme');
+        } catch (error) {
+          console.error('Unable to save query', error);
+        }
 
         setSchemeAnswer({ ...schData, isEscalated });
       }, 1000);

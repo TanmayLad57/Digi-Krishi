@@ -19,11 +19,13 @@ import {
   Camera,
   Play
 } from 'lucide-react';
-import { getStoredCases, saveStoredCases } from '../data/mockCases';
+import { useAuth } from '../context/AuthContext';
+import { getOfficerQuery, updateOfficerQuery } from '../lib/queries';
 
 export default function OfficerCaseDetailPage() {
   const { caseId } = useParams();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [caseData, setCaseData] = useState(null);
   const [responseText, setResponseText] = useState('');
   const [isSent, setIsSent] = useState(false);
@@ -50,13 +52,16 @@ export default function OfficerCaseDetailPage() {
   ];
 
   useEffect(() => {
-    const allCases = getStoredCases();
-    const found = allCases.find((c) => c.id === caseId) || allCases[0];
-    setCaseData(found);
-    if (found?.officerResponse) {
-      setResponseText(found.officerResponse);
-    }
-  }, [caseId]);
+    getOfficerQuery(caseId)
+      .then((found) => {
+        setCaseData(found);
+        setResponseText(found.officerResponse || '');
+      })
+      .catch((error) => {
+        console.error('Unable to load officer case', error);
+        navigate('/officer-dashboard/cases');
+      });
+  }, [caseId, navigate]);
 
   if (!caseData) return null;
 
@@ -70,52 +75,43 @@ export default function OfficerCaseDetailPage() {
   };
 
   // Save Response
-  const handleSendResponse = (e) => {
+  const handleSendResponse = async (e) => {
     e.preventDefault();
-    if (!responseText.trim()) return;
+    if (!responseText.trim() || !currentUser?.id) return;
 
-    const allCases = getStoredCases();
-    const updated = allCases.map((c) => {
-      if (c.id === caseData.id) {
-        return {
-          ...c,
-          officerResponse: responseText,
-          status: c.status === 'Pending' ? 'In Progress' : c.status,
-          timeline: [
-            ...c.timeline,
-            { step: 'Officer Responded', time: 'Just now', text: `Officer sent response via SMS: "${responseText.substring(0, 45)}..."` },
-          ],
-        };
-      }
-      return c;
-    });
-
-    saveStoredCases(updated);
-    setCaseData((prev) => ({ ...prev, officerResponse: responseText, status: prev.status === 'Pending' ? 'In Progress' : prev.status }));
-    setIsSent(true);
-    setTimeout(() => setIsSent(false), 3000);
+    try {
+      await updateOfficerQuery(caseData.id, currentUser.id, {
+        officer_response: responseText.trim(),
+        status: 'escalated',
+      });
+      setCaseData((prev) => ({
+        ...prev,
+        officerResponse: responseText.trim(),
+        status: 'In Progress',
+        timeline: [...prev.timeline, { step: 'Officer Responded', time: 'Just now', text: 'Officer advisory saved.' }],
+      }));
+      setIsSent(true);
+      setTimeout(() => setIsSent(false), 3000);
+    } catch (error) {
+      console.error('Unable to save officer response', error);
+      alert('The response could not be saved. Please try again.');
+    }
   };
 
   // Toggle Resolve
-  const handleToggleResolve = () => {
-    const newStatus = caseData.status === 'Resolved' ? 'In Progress' : 'Resolved';
-    const allCases = getStoredCases();
-    const updated = allCases.map((c) => {
-      if (c.id === caseData.id) {
-        return {
-          ...c,
-          status: newStatus,
-          timeline: [
-            ...c.timeline,
-            { step: newStatus, time: 'Just now', text: `Case marked as ${newStatus} by Officer.` },
-          ],
-        };
-      }
-      return c;
-    });
-
-    saveStoredCases(updated);
-    setCaseData((prev) => ({ ...prev, status: newStatus }));
+  const handleToggleResolve = async () => {
+    if (!currentUser?.id || caseData.status === 'Resolved') return;
+    try {
+      await updateOfficerQuery(caseData.id, currentUser.id, { status: 'resolved' });
+      setCaseData((prev) => ({
+        ...prev,
+        status: 'Resolved',
+        timeline: [...prev.timeline, { step: 'Resolved', time: 'Just now', text: 'Case marked as resolved by officer.' }],
+      }));
+    } catch (error) {
+      console.error('Unable to resolve officer case', error);
+      alert('The case could not be marked as resolved. Please try again.');
+    }
   };
 
   return (

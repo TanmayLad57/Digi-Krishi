@@ -14,7 +14,7 @@ import {
   Clock,
   Sparkles
 } from 'lucide-react';
-import { getStoredCases } from '../data/mockCases';
+import { getOfficerQueries } from '../lib/queries';
 
 export default function OfficerCasesPage() {
   const navigate = useNavigate();
@@ -28,7 +28,9 @@ export default function OfficerCasesPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    setCases(getStoredCases());
+    getOfficerQueries()
+      .then(setCases)
+      .catch((error) => console.error('Unable to load escalated queries', error));
   }, []);
 
   // Filter & Sort Logic
