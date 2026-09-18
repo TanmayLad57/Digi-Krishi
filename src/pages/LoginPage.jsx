@@ -79,13 +79,12 @@ export default function LoginPage() {
         
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <Link to="/" className="inline-flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-[#1b4332] text-[#e9c46a] flex items-center justify-center shadow-md">
-              <Sprout className="w-5 h-5" />
-            </div>
-            <span className="font-serif-display text-2xl font-bold text-[#111827]">
-              {t('navbar.brandName')}
-            </span>
+          <Link to="/" className="inline-flex items-center justify-center group">
+            <img
+              src="/images/logo.png"
+              alt="Digi Krishi"
+              className="h-16 w-auto rounded-2xl shadow-md object-contain group-hover:opacity-90 transition-opacity"
+            />
           </Link>
           <h1 className="font-serif-display text-xl font-bold text-gray-900 pt-1">
             {t('auth.loginTitle')}

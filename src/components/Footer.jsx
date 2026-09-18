@@ -14,13 +14,12 @@ export default function Footer() {
           
           {/* Brand & Description */}
           <div className="md:col-span-5 space-y-4">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#2d6a4f] flex items-center justify-center text-[#e9c46a] shadow-md">
-                <Sprout className="w-5 h-5" />
-              </div>
-              <span className="font-serif-display text-2xl font-bold text-[#f3eee7]">
-                {t('navbar.brandName')}
-              </span>
+            <Link to="/" className="inline-flex items-center gap-3 group">
+              <img
+                src="/images/logo.png"
+                alt="Digi Krishi"
+                className="h-12 w-auto rounded-xl object-contain shadow-md group-hover:opacity-90 transition-opacity"
+              />
             </Link>
 
             <p className="text-sm text-gray-300 font-body leading-relaxed max-w-md">
@@ -85,7 +84,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-[#2d6a4f]/30 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400 gap-4 font-medium">
-          <p>© {new Date().getFullYear()} Krishi Sathi. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Digi Krishi. All rights reserved.</p>
           <p className="flex items-center gap-1">
             <span>Crafted with</span>
             <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />

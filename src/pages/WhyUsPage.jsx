@@ -112,7 +112,7 @@ export default function WhyUsPage() {
               Seamless Escalation to Extension Officers
             </h2>
             <p className="text-sm text-gray-700 leading-relaxed font-body">
-              Krishi Sathi doesn't replace real experts — it empowers them. When AI encounters complex symptoms or severe pest outbreaks, it immediately queues the case for a local Krishi Vigyan Kendra extension officer for field review.
+              Digi Krishi doesn't replace real experts — it empowers them. When AI encounters complex symptoms or severe pest outbreaks, it immediately queues the case for a local Krishi Vigyan Kendra extension officer for field review.
             </p>
             <div className="pt-2">
               <Link

@@ -56,9 +56,13 @@ export default function LanguageSelectionOverlay() {
             {/* Top decorative gradient glow */}
             <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#e9c46a]/20 rounded-full blur-3xl pointer-events-none" />
 
-            {/* Icon */}
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#1b4332] text-[#e9c46a] flex items-center justify-center mx-auto shadow-lg shadow-[#1b4332]/25 relative z-10">
-              <Sprout className="w-9 h-9 sm:w-11 sm:h-11" />
+            {/* Logo Image */}
+            <div className="mx-auto flex items-center justify-center relative z-10">
+              <img
+                src="/images/logo.png"
+                alt="Digi Krishi"
+                className="h-20 sm:h-24 w-auto rounded-2xl shadow-lg object-contain"
+              />
             </div>
 
             {/* Multilingual Heading */}
@@ -67,7 +71,7 @@ export default function LanguageSelectionOverlay() {
                 Choose Your Language / अपनी भाषा चुनें / तुमची भाषा निवडा / നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കുക
               </h2>
               <p className="text-xs sm:text-sm text-gray-600 font-medium">
-                Welcome to Krishi Sathi. Select your preferred language to continue.
+                Welcome to Digi Krishi. Select your preferred language to continue.
               </p>
             </div>
 

@@ -1,7 +1,7 @@
 {
   "langOverlay": {
     "title": "Choose Your Language / अपनी भाषा चुनें / तुमची भाषा निवडा / നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കുക",
-    "subtitle": "Select your preferred language to continue using Krishi Sathi",
+    "subtitle": "Select your preferred language to continue using Digi Krishi",
     "selectNotice": "You can change your language anytime from the top navigation bar.",
     "en": "English",
     "hi": "हिंदी",
@@ -19,7 +19,7 @@
     "coconut": "Coconut"
   },
   "navbar": {
-    "brandName": "Krishi Sathi",
+    "brandName": "Digi Krishi",
     "brandTagline": "AI Agricultural Advisory",
     "home": "Home",
     "ai": "Ask AI",
@@ -104,7 +104,7 @@
   },
   "howItWorks": {
     "badge": "4-Step Simple Process",
-    "title": "How Krishi Sathi Advisory Works",
+    "title": "How Digi Krishi Advisory Works",
     "subtext": "From voice input to verified treatment plans, our platform ensures every farmer gets accurate guidance.",
     "s1Number": "01",
     "s1Title": "Submit Your Question",
@@ -120,7 +120,7 @@
     "s4Desc": "Complex cases automatically alert local Krishi Vigyan Kendra officers for human verification."
   },
   "whyUs": {
-    "badge": "Why Choose Krishi Sathi",
+    "badge": "Why Choose Digi Krishi",
     "title": "Empowering Farmers with Technology & Trust",
     "subtext": "Designed specifically for smallholder and commercial farmers across India's diverse agro-climatic zones.",
     "c1Title": "24/7 Instant Response",
@@ -147,7 +147,7 @@
     "copyright": "Digital Krishi Advisory Engine. Built for Indian Agriculture."
   },
   "auth": {
-    "loginTitle": "Welcome Back to Krishi Sathi",
+    "loginTitle": "Welcome Back to Digi Krishi",
     "loginSub": "Sign in to access your saved crop advisory history and government scheme status.",
     "registerTitle": "Create Your Free Account",
     "registerSub": "Register to ask unlimited crop questions and connect with local Extension Officers.",

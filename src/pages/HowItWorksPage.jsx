@@ -125,7 +125,7 @@ export default function HowItWorksPage() {
               Backed by Verified Agricultural Intelligence
             </h3>
             <p className="text-sm text-gray-700">
-              Unlike generic chatbot models, Krishi Sathi is grounded in verified scientific datasets.
+              Unlike generic chatbot models, Digi Krishi is grounded in verified scientific datasets.
             </p>
           </div>
 
