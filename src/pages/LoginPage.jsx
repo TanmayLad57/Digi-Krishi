@@ -18,7 +18,7 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { login } = useAuth();
+  const { refreshProfile } = useAuth();
   const navigate = useNavigate();
 
   const handleRoleChange = (newRole) => {
@@ -39,13 +39,19 @@ export default function LoginPage() {
     setErrorMsg('');
 
     try {
+      let authUser;
       if (role === 'farmer') {
-        await loginFarmer({ phone: emailOrPhone.trim(), password });
+        authUser = await loginFarmer({ phone: emailOrPhone.trim(), password });
       } else {
         if (!emailOrPhone.includes('@')) {
           throw new Error('Please sign in with your official email address.');
         }
-        await loginOfficer({ email: emailOrPhone.trim(), password });
+        authUser = await loginOfficer({ email: emailOrPhone.trim(), password });
+      }
+
+      const profile = await refreshProfile(authUser);
+      if (!profile) {
+        throw new Error('Sign-in succeeded, but your profile could not be loaded. Check the profiles RLS policies in Supabase.');
       }
 
       if (redirectPath) {

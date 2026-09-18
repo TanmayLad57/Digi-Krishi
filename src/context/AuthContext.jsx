@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 const AuthContext = createContext();
@@ -42,9 +42,13 @@ async function loadUserProfile(supabaseUser) {
     .eq('id', supabaseUser.id)
     .single();
 
-  if (profileError || !profile) {
+  if (profileError) {
     console.error('Failed to load profile for logged-in user', profileError);
-    return null;
+    throw new Error(`Unable to load your profile: ${profileError.message}`);
+  }
+
+  if (!profile) {
+    throw new Error('This Auth account has no matching row in public.profiles.');
   }
 
   if (profile.role === 'farmer') {
@@ -102,6 +106,23 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const refreshProfile = useCallback(async (supabaseUser) => {
+    const user = supabaseUser || (await supabase.auth.getUser()).data.user;
+    if (!user) {
+      setCurrentUser(null);
+      return null;
+    }
+
+    try {
+      const profile = await loadUserProfile(user);
+      setCurrentUser(profile);
+      return profile;
+    } catch (error) {
+      setCurrentUser(null);
+      throw error;
+    }
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -109,8 +130,13 @@ export const AuthProvider = ({ children }) => {
     // (e.g. user refreshed the page while logged in).
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
-        const profile = await loadUserProfile(session.user);
-        if (isMounted) setCurrentUser(profile);
+        try {
+          const profile = await loadUserProfile(session.user);
+          if (isMounted) setCurrentUser(profile);
+        } catch (error) {
+          console.error(error);
+          if (isMounted) setCurrentUser(null);
+        }
       }
       if (isMounted) setLoading(false);
     });
@@ -119,8 +145,13 @@ export const AuthProvider = ({ children }) => {
     // (login, logout, token refresh, etc. all flow through here).
     const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        const profile = await loadUserProfile(session.user);
-        if (isMounted) setCurrentUser(profile);
+        try {
+          const profile = await loadUserProfile(session.user);
+          if (isMounted) setCurrentUser(profile);
+        } catch (error) {
+          console.error(error);
+          if (isMounted) setCurrentUser(null);
+        }
       } else {
         if (isMounted) setCurrentUser(null);
       }
@@ -144,6 +175,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!currentUser,
     isFarmer: currentUser?.role === 'farmer',
     isOfficer: currentUser?.role === 'officer',
+    refreshProfile,
     logout,
   };
 

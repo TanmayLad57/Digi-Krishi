@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { createCropImageUrl } from './storage';
 
 const modeLabels = {
   text: 'Ask AI Text',
@@ -11,8 +12,6 @@ const formatDate = (value) => new Date(value).toLocaleString([], {
   day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit',
 });
 
-const isRemoteUrl = (value) => /^https?:\/\//.test(value || '');
-
 export async function createQuery({ farmerId, mode, question, response, confidence, language, imageUrl, voiceUrl }) {
   const { data, error } = await supabase
     .from('queries')
@@ -24,8 +23,8 @@ export async function createQuery({ farmerId, mode, question, response, confiden
       confidence,
       language,
       status: confidence < 80 ? 'escalated' : 'answered',
-      image_url: isRemoteUrl(imageUrl) ? imageUrl : null,
-      voice_url: isRemoteUrl(voiceUrl) ? voiceUrl : null,
+      image_url: imageUrl || null,
+      voice_url: voiceUrl || null,
     })
     .select()
     .single();
@@ -42,7 +41,7 @@ export async function getFarmerQueries(farmerId, fallbackCrop = 'Crop advisory')
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return (data || []).map((row) => toFarmerHistory(row, fallbackCrop));
+  return Promise.all((data || []).map((row) => toFarmerHistory(row, fallbackCrop)));
 }
 
 export async function getOfficerQueries() {
@@ -53,7 +52,7 @@ export async function getOfficerQueries() {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return (data || []).map(toOfficerCase);
+  return Promise.all((data || []).map(toOfficerCase));
 }
 
 export async function getOfficerQuery(queryId) {
@@ -76,7 +75,7 @@ export async function updateOfficerQuery(queryId, officerId, updates) {
   if (error) throw error;
 }
 
-function toFarmerHistory(row, fallbackCrop) {
+async function toFarmerHistory(row, fallbackCrop) {
   const isEscalated = row.status === 'escalated';
   return {
     id: row.id,
@@ -88,14 +87,14 @@ function toFarmerHistory(row, fallbackCrop) {
     remedy: row.response || '',
     aiConfidence: Number(row.confidence ?? 0),
     status: isEscalated ? 'Auto-Escalated' : row.status === 'resolved' ? 'Officer Resolved' : 'AI Resolved',
-    photoUrl: row.image_url,
+    photoUrl: await createCropImageUrl(row.image_url),
     audioTranscript: row.mode === 'voice' ? row.question : null,
     officerResponse: row.officer_response,
     escalationNote: isEscalated ? `AI confidence (${row.confidence}%) is below the 80% escalation threshold.` : null,
   };
 }
 
-function toOfficerCase(row) {
+async function toOfficerCase(row) {
   const profile = row.profiles || {};
   const details = Array.isArray(profile.farmer_details) ? profile.farmer_details[0] : profile.farmer_details || {};
   const hasOfficerResponse = Boolean(row.officer_response);
@@ -113,7 +112,7 @@ function toOfficerCase(row) {
     crop,
     queryType: modeLabels[row.mode] || row.mode,
     question: row.question,
-    photoUrl: row.image_url,
+    photoUrl: await createCropImageUrl(row.image_url),
     aiDiagnosis: row.response || 'AI advisory pending',
     aiConfidence: Number(row.confidence ?? 0),
     escalationReason: `AI confidence ${row.confidence ?? 'N/A'}% is below the 80% threshold.`,

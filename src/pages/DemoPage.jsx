@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { createQuery } from '../lib/queries';
+import { uploadCropImage } from '../lib/storage';
 import { getMockResponses } from '../data/mockResponses';
 
 export default function DemoPage() {
@@ -82,7 +83,7 @@ export default function DemoPage() {
       response: [data.aiDiagnosis, data.remedy, data.weatherAlert].filter(Boolean).join('\n\n'),
       confidence,
       language: currentLang,
-      imageUrl: data.photoUrl,
+      imageUrl: data.storageImagePath,
     });
     return confidence < 80;
   };
@@ -205,7 +206,7 @@ export default function DemoPage() {
   };
 
   // Trigger Photo Scan
-  const triggerPhotoScan = (imageSrc) => {
+  const triggerPhotoScan = (imageSrc, storageImagePath = null) => {
     checkAuthOrGate(() => {
       setScannedImage(imageSrc);
       setScanState('scanning');
@@ -215,6 +216,7 @@ export default function DemoPage() {
         const sData = {
           ...mockData.scanQuery,
           photoUrl: imageSrc,
+          storageImagePath,
         };
 
         let isEscalated = false;
@@ -233,7 +235,15 @@ export default function DemoPage() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const imageURL = URL.createObjectURL(file);
-      triggerPhotoScan(imageURL);
+      checkAuthOrGate(() => {
+        uploadCropImage(file, currentUser.id)
+          .then((storageImagePath) => triggerPhotoScan(imageURL, storageImagePath))
+          .catch((error) => {
+            URL.revokeObjectURL(imageURL);
+            console.error('Unable to upload crop image', error);
+            alert(error.message || 'The crop image could not be uploaded.');
+          });
+      });
     }
   };
 
