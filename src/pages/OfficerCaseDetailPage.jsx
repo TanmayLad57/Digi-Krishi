@@ -207,7 +207,10 @@ export default function OfficerCaseDetailPage() {
               {/* Voice Query Audio Player if applicable */}
               {caseData.queryType.includes('Voice') && (
                 <div className="pt-2 flex items-center gap-3">
-                  <button
+                  {caseData.audioUrl ? (
+                    <audio controls src={caseData.audioUrl} className="w-full" />
+                  ) : (
+                    <button
                     onClick={() => setIsAudioPlaying(!isAudioPlaying)}
                     className="px-4 py-2 rounded-xl bg-[#1b4332] text-white text-xs font-bold flex items-center gap-2 hover:bg-[#2d6a4f]"
                   >
@@ -223,6 +226,7 @@ export default function OfficerCaseDetailPage() {
                       </>
                     )}
                   </button>
+                  )}
                 </div>
               )}
             </div>

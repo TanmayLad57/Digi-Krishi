@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-import { createCropImageUrl } from './storage';
+import { createCropImageUrl, createVoiceUrl } from './storage';
 
 const modeLabels = {
   text: 'Ask AI Text',
@@ -89,6 +89,7 @@ async function toFarmerHistory(row, fallbackCrop) {
     status: isEscalated ? 'Auto-Escalated' : row.status === 'resolved' ? 'Officer Resolved' : 'AI Resolved',
     photoUrl: await createCropImageUrl(row.image_url),
     audioTranscript: row.mode === 'voice' ? row.question : null,
+    audioUrl: await createVoiceUrl(row.voice_url),
     officerResponse: row.officer_response,
     escalationNote: isEscalated ? `AI confidence (${row.confidence}%) is below the 80% escalation threshold.` : null,
   };
@@ -113,6 +114,7 @@ async function toOfficerCase(row) {
     queryType: modeLabels[row.mode] || row.mode,
     question: row.question,
     photoUrl: await createCropImageUrl(row.image_url),
+    audioUrl: await createVoiceUrl(row.voice_url),
     aiDiagnosis: row.response || 'AI advisory pending',
     aiConfidence: Number(row.confidence ?? 0),
     escalationReason: `AI confidence ${row.confidence ?? 'N/A'}% is below the 80% threshold.`,

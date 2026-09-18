@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { createQuery } from '../lib/queries';
-import { uploadCropImage } from '../lib/storage';
+import { uploadCropImage, uploadVoiceRecording } from '../lib/storage';
 import { getMockResponses } from '../data/mockResponses';
 
 export default function DemoPage() {
@@ -48,6 +48,10 @@ export default function DemoPage() {
   const [voiceState, setVoiceState] = useState('idle'); // 'idle' | 'recording' | 'processing' | 'done'
   const [voiceTimer, setVoiceTimer] = useState(0);
   const [voiceAnswer, setVoiceAnswer] = useState(null);
+  const mediaRecorderRef = useRef(null);
+  const recordingStreamRef = useRef(null);
+  const recordingChunksRef = useRef([]);
+  const recordingTimerRef = useRef(null);
 
   // Tab 3: Crop Disease Scan State
   const [scanState, setScanState] = useState('idle'); // 'idle' | 'scanning' | 'done'
@@ -84,6 +88,7 @@ export default function DemoPage() {
       confidence,
       language: currentLang,
       imageUrl: data.storageImagePath,
+      voiceUrl: data.storageVoicePath,
     });
     return confidence < 80;
   };
@@ -146,50 +151,84 @@ export default function DemoPage() {
     });
   };
 
-  // Start Voice Recording
+  const finishRecordedAudio = async () => {
+    const mimeType = mediaRecorderRef.current?.mimeType || 'audio/webm';
+    const extension = mimeType.includes('mp4') ? 'm4a' : 'webm';
+    const audioBlob = new Blob(recordingChunksRef.current, { type: mimeType });
+    recordingChunksRef.current = [];
+    recordingStreamRef.current?.getTracks().forEach((track) => track.stop());
+    recordingStreamRef.current = null;
+    setVoiceState('processing');
+
+    try {
+      const audioFile = new File([audioBlob], `krishi-voice-${Date.now()}.${extension}`, { type: mimeType });
+      const storageVoicePath = await uploadVoiceRecording(audioFile, currentUser.id);
+      const vData = { ...mockData.voiceQuery, storageVoicePath };
+      const isEscalated = await persistQuery(vData, 'voice');
+      setVoiceAnswer({ ...vData, isEscalated });
+      setVoiceState('done');
+    } catch (error) {
+      console.error('Unable to upload recorded voice query', error);
+      setVoiceState('idle');
+      alert(error.message || 'The voice recording could not be uploaded.');
+    } finally {
+      mediaRecorderRef.current = null;
+    }
+  };
+
+  // Start a real microphone recording. The audio is uploaded when the farmer stops it.
   const handleStartRecording = () => {
-    checkAuthOrGate(() => {
-      setVoiceState('recording');
-      setVoiceTimer(3);
+    checkAuthOrGate(async () => {
+      if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+        alert('Voice recording is not supported in this browser. Please upload an audio file instead.');
+        return;
+      }
 
-      const interval = setInterval(() => {
-        setVoiceTimer((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            setVoiceState('processing');
-            setTimeout(async () => {
-              setVoiceState('done');
-              const vData = {
-                ...mockData.voiceQuery
-              };
-
-              let isEscalated = false;
-              try {
-                isEscalated = await persistQuery(vData, 'voice');
-              } catch (error) {
-                console.error('Unable to save query', error);
-              }
-
-              setVoiceAnswer({ ...vData, isEscalated });
-            }, 1200);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const recorder = new MediaRecorder(stream);
+        recordingStreamRef.current = stream;
+        recordingChunksRef.current = [];
+        recorder.ondataavailable = (event) => {
+          if (event.data.size > 0) recordingChunksRef.current.push(event.data);
+        };
+        recorder.onstop = finishRecordedAudio;
+        recorder.onerror = () => {
+          stream.getTracks().forEach((track) => track.stop());
+          setVoiceState('idle');
+          alert('Recording failed. Please try again or upload an audio file.');
+        };
+        mediaRecorderRef.current = recorder;
+        setVoiceTimer(0);
+        setVoiceState('recording');
+        recordingTimerRef.current = setInterval(() => setVoiceTimer((seconds) => seconds + 1), 1000);
+        recorder.start();
+      } catch (error) {
+        console.error('Microphone permission was denied or unavailable', error);
+        alert('Please allow microphone access to record a voice query.');
+      }
     });
+  };
+
+  const handleStopRecording = () => {
+    if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+    recordingTimerRef.current = null;
+    if (mediaRecorderRef.current?.state === 'recording') mediaRecorderRef.current.stop();
   };
 
   // Handle Audio File Upload
   const handleAudioUpload = (e) => {
     checkAuthOrGate(() => {
       if (e.target.files && e.target.files[0]) {
+        const voiceFile = e.target.files[0];
         setVoiceState('processing');
-        setTimeout(async () => {
+        uploadVoiceRecording(voiceFile, currentUser.id).then((storageVoicePath) => {
+          setTimeout(async () => {
           setVoiceState('done');
           const vData = {
             ...mockData.voiceQuery,
             queryType: 'Voice Query (Uploaded Audio)',
+            storageVoicePath,
           };
 
           let isEscalated = false;
@@ -200,7 +239,12 @@ export default function DemoPage() {
           }
 
           setVoiceAnswer({ ...vData, isEscalated });
-        }, 1200);
+          }, 1200);
+        }).catch((error) => {
+          console.error('Unable to upload voice recording', error);
+          setVoiceState('idle');
+          alert(error.message || 'The voice recording could not be uploaded.');
+        });
       }
     });
   };
@@ -528,8 +572,16 @@ export default function DemoPage() {
                       </div>
                       <div className="space-y-1">
                         <span className="text-xs font-bold uppercase tracking-wider text-[#d97706]">{t('aiPage.voiceListening')}</span>
-                        <h4 className="text-2xl font-bold text-gray-900 font-serif-display">0:0{voiceTimer} {t('aiPage.remaining')}</h4>
+                        <h4 className="text-2xl font-bold text-gray-900 font-serif-display">
+                          {String(Math.floor(voiceTimer / 60)).padStart(2, '0')}:{String(voiceTimer % 60).padStart(2, '0')}
+                        </h4>
                       </div>
+                      <button
+                        onClick={handleStopRecording}
+                        className="mx-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-sm shadow-md transition-all"
+                      >
+                        <span>Stop &amp; Submit Recording</span>
+                      </button>
                     </div>
                   )}
 

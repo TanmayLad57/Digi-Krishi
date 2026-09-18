@@ -238,6 +238,12 @@ export default function FarmerDashboardPage() {
                               </div>
                             )}
 
+                            {item.audioUrl && (
+                              <audio controls src={item.audioUrl} className="w-full pt-2">
+                                Your browser does not support audio playback.
+                              </audio>
+                            )}
+
                             {item.photoUrl && (
                               <div className="pt-2">
                                 <span className="text-xs font-bold text-gray-600 block mb-1">{t('dashboard.uploadedLeafPhoto')}</span>
