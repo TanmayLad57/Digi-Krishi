@@ -5,6 +5,7 @@ const modeLabels = {
   text: 'Ask AI Text',
   voice: 'Voice Query',
   image: 'Crop Photo Scan',
+  photo: 'Crop Photo Scan',
   scheme: 'Government Scheme',
 };
 

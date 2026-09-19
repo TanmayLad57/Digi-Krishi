@@ -235,28 +235,44 @@ export default function DemoPage() {
   };
 
   // Trigger Photo Scan
-  const triggerPhotoScan = (imageSrc, storageImagePath = null) => {
+  const triggerPhotoScan = (imageSrc, storageImagePath) => {
     checkAuthOrGate(() => {
       setScannedImage(imageSrc);
       setScanState('scanning');
 
-      setTimeout(async () => {
-        setScanState('done');
-        const sData = {
-          ...mockData.scanQuery,
-          photoUrl: imageSrc,
-          storageImagePath,
-        };
-
-        let isEscalated = false;
+      (async () => {
         try {
-          isEscalated = await persistQuery(sData, 'image');
-        } catch (error) {
-          console.error('Unable to save query', error);
-        }
+          const { data, error } = await supabase.functions.invoke('scan-crop', {
+            body: { imagePath: storageImagePath, language: currentLang },
+          });
+          if (error) throw error;
 
-        setScanAnswer({ ...sData, isEscalated });
-      }, 1500);
+          const sData = {
+            question: 'Crop photo disease scan',
+            query: 'Crop photo disease scan',
+            photoUrl: imageSrc,
+            storageImagePath,
+            aiDiagnosis: data.identifiedCondition,
+            aiConfidence: data.confidenceScore,
+            remedy: data.treatmentPlan,
+          };
+
+          let isEscalated = false;
+          try {
+            isEscalated = await persistQuery(sData, 'photo');
+          } catch (error) {
+            console.error('Unable to save crop scan', error);
+            alert('Your crop scan is ready, but it could not be saved to your query history. Please try again.');
+          }
+
+          setScanAnswer({ ...sData, isEscalated });
+          setScanState('done');
+        } catch (error) {
+          console.error('Unable to scan crop image', error);
+          setScanState('idle');
+          alert('We could not analyze this crop photo right now. Please try again.');
+        }
+      })();
     });
   };
 
@@ -274,6 +290,22 @@ export default function DemoPage() {
           });
       });
     }
+  };
+
+  const handleSamplePhotoScan = () => {
+    checkAuthOrGate(async () => {
+      try {
+        const response = await fetch('/images/disease-scanner.png');
+        if (!response.ok) throw new Error('Unable to load sample crop photo.');
+        const blob = await response.blob();
+        const sampleFile = new File([blob], 'sample-crop-photo.png', { type: blob.type || 'image/png' });
+        const storageImagePath = await uploadCropImage(sampleFile, currentUser.id);
+        triggerPhotoScan('/images/disease-scanner.png', storageImagePath);
+      } catch (error) {
+        console.error('Unable to prepare sample crop photo', error);
+        alert(error.message || 'The sample crop image could not be uploaded.');
+      }
+    });
   };
 
   // Submit Government Scheme Check
@@ -697,7 +729,7 @@ export default function DemoPage() {
                         <span className="text-xs font-bold text-gray-500 block mb-2">{t('aiPage.presetSample')}</span>
                         <div className="flex flex-wrap items-center justify-center gap-3">
                           <button
-                            onClick={() => triggerPhotoScan('/images/disease-scanner.png')}
+                            onClick={handleSamplePhotoScan}
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-300 text-xs font-bold text-gray-800 hover:bg-[#1b4332]/10 hover:border-[#1b4332] cursor-pointer"
                           >
                             <ImageIcon className="w-4 h-4 text-[#d97706]" />
