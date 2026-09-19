@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { createQuery } from '../lib/queries';
+import { supabase } from '../lib/supabaseClient';
 import { uploadCropImage, uploadVoiceRecording } from '../lib/storage';
 import { getMockResponses } from '../data/mockResponses';
 
@@ -102,52 +103,36 @@ export default function DemoPage() {
       setUserQuery(q);
       setIsAnalyzingText(true);
 
-      setTimeout(async () => {
-        setIsAnalyzingText(false);
-        setTextSubmitted(true);
-
-        let template = mockData.textQueries.default;
-        const lowerQ = q.toLowerCase();
-        if (
-          lowerQ.includes('banana') ||
-          lowerQ.includes('black spot') ||
-          lowerQ.includes('केला') ||
-          lowerQ.includes('काले') ||
-          lowerQ.includes('केळी') ||
-          lowerQ.includes('വാഴ') ||
-          lowerQ.includes('കറുത്ത')
-        ) {
-          template = mockData.textQueries.banana;
-        } else if (
-          lowerQ.includes('cotton') ||
-          lowerQ.includes('yellow') ||
-          lowerQ.includes('कपास') ||
-          lowerQ.includes('पीले') ||
-          lowerQ.includes('पिवळे') ||
-          lowerQ.includes('മഞ്ഞ')
-        ) {
-          template = mockData.textQueries.cotton;
-        }
-
-        const answerData = {
-          ...template,
-          question: q,
-          query: q,
-        };
-
-        let isEscalated = false;
+      (async () => {
         try {
-          isEscalated = await persistQuery(answerData, 'text');
-        } catch (error) {
-          console.error('Unable to save query', error);
-          alert('AI answer is ready, but it could not be saved to your query history. Please try again.');
-        }
+          const { data, error } = await supabase.functions.invoke('ask-ai', {
+            body: { question: q, language: currentLang },
+          });
+          if (error) throw error;
 
-        setActiveAnswer({
-          ...answerData,
-          isEscalated,
-        });
-      }, 1000);
+          const answerData = {
+            question: q,
+            query: q,
+            aiDiagnosis: data.identifiedCondition,
+            aiConfidence: data.confidenceScore,
+            remedy: data.treatmentPlan,
+          };
+          let isEscalated = false;
+          try {
+            isEscalated = await persistQuery(answerData, 'text');
+          } catch (error) {
+            console.error('Unable to save AI advisory', error);
+            alert('Your AI advisory is ready, but it could not be saved to your query history. Please try again.');
+          }
+          setActiveAnswer({ ...answerData, isEscalated });
+          setTextSubmitted(true);
+        } catch (error) {
+          console.error('Unable to get AI advisory', error);
+          alert('We could not get an AI advisory right now. Please try again.');
+        } finally {
+          setIsAnalyzingText(false);
+        }
+      })();
     });
   };
 
