@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 
 import { supabase } from './lib/supabaseClient';
@@ -8,6 +8,7 @@ import Footer from './components/Footer';
 import OfficerRouteGuard from './components/OfficerRouteGuard';
 import OfficerLayout from './components/OfficerLayout';
 import LanguageSelectionOverlay from './components/LanguageSelectionOverlay';
+import IntroAnimation from './components/IntroAnimation';
 
 import HomePage from './pages/HomePage';
 import DemoPage from './pages/DemoPage';
@@ -64,9 +65,19 @@ function AnimatedRoutes() {
 export default function App() {
   console.log('Supabase client:', supabase);
 
+  const [showIntro, setShowIntro] = useState(() => {
+    return !sessionStorage.getItem('hasSeenIntro');
+  });
+
+  const handleIntroComplete = () => {
+    sessionStorage.setItem('hasSeenIntro', 'true');
+    setShowIntro(false);
+  };
+
   return (
     <AuthProvider>
-      <LanguageSelectionOverlay />
+      {showIntro && <IntroAnimation onComplete={handleIntroComplete} />}
+      {!showIntro && <LanguageSelectionOverlay />}
       <AnimatedRoutes />
     </AuthProvider>
   );
