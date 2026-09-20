@@ -76,11 +76,13 @@ Deno.serve(async (request) => {
         },
         body: JSON.stringify({
           model: "qwen/qwen3.8-27b",
+          reasoning_effort: "none",
+          max_completion_tokens: 700,
           response_format: { type: "json_object" },
           messages: [
             {
               role: "system",
-              content: `You are an agricultural advisory assistant for Indian farmers. Identify the crop and any visible disease or pest from the photo. Respond in ${language.trim()}. Always return a JSON object with these exact fields: identifiedCondition (string), confidenceScore (number 0-100), treatmentPlan (string). If the image is not a plant, does not show a crop condition clearly, or is too unclear to assess, state that in identifiedCondition, set confidenceScore to 30 or lower, and ask for a clearer crop photo in treatmentPlan.`,
+              content: `You are an agricultural advisory assistant for Indian farmers. Identify the crop and any visible disease or pest from the photo. Respond in ${language.trim()}. Always return a JSON object with these exact fields: identifiedCondition (string), confidenceScore (number 0-100), treatmentPlan (string). If the image is not a plant, does not show a crop condition clearly, or is too unclear to assess, state that in identifiedCondition, set confidenceScore to 30 or lower, and ask for a clearer crop photo in treatmentPlan. Keep treatmentPlan concise: under 80 words, plain text, no markdown.`,
             },
             {
               role: "user",
@@ -115,9 +117,13 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: "AI service returned an invalid response" }, 502);
     }
 
+    const cleanedContent = content.replace(/```(?:json)?/gi, "").replace(/```/g, "").trim();
+    const jsonMatch = cleanedContent.match(/\{[\s\S]*\}/);
+    const rawJson = jsonMatch ? jsonMatch[0] : cleanedContent;
+
     let result: unknown;
     try {
-      result = JSON.parse(content);
+      result = JSON.parse(rawJson);
     } catch {
       return jsonResponse({ error: "AI service returned invalid JSON" }, 502);
     }
