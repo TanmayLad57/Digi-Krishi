@@ -64,6 +64,14 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: "AI service is not configured" }, 503);
     }
 
+    const languageMap: Record<string, string> = {
+      mr: "Marathi",
+      hi: "Hindi",
+      ml: "Malayalam",
+      en: "English",
+    };
+    const targetLanguage = languageMap[language.trim().toLowerCase().split("-")[0]] ?? language.trim();
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 25_000);
     let groqResponse: Response;
@@ -82,7 +90,7 @@ Deno.serve(async (request) => {
           messages: [
             {
               role: "system",
-              content: `You are an agricultural advisory assistant for Indian farmers. Identify the crop and any visible disease or pest from the photo. Respond in ${language.trim()}. Always return a JSON object with these exact fields: identifiedCondition (string), confidenceScore (number 0-100), treatmentPlan (string). If the image is not a plant, does not show a crop condition clearly, or is too unclear to assess, state that in identifiedCondition, set confidenceScore to 30 or lower, and ask for a clearer crop photo in treatmentPlan. Keep treatmentPlan concise: under 80 words, plain text, no markdown.`,
+              content: `You are an agricultural advisory assistant for Indian farmers. Identify the crop and any visible disease or pest from the photo. Respond in ${targetLanguage}. Always return a JSON object with these exact fields: identifiedCondition (string), confidenceScore (number 0-100), treatmentPlan (string). If the image is not a plant, does not show a crop condition clearly, or is too unclear to assess, state that in identifiedCondition, set confidenceScore to 30 or lower, and ask for a clearer crop photo in treatmentPlan. Keep treatmentPlan concise: under 80 words, plain text, no markdown.`,
             },
             {
               role: "user",
