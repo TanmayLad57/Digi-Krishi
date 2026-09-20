@@ -136,6 +136,42 @@ export default function DemoPage() {
     });
   };
 
+  const processVoiceQuery = async (storageVoicePath) => {
+    const { data: transcription, error: transcriptionError } = await supabase.functions.invoke('transcribe-voice', {
+      body: { audioPath: storageVoicePath },
+    });
+    if (transcriptionError) throw transcriptionError;
+
+    const transcript = transcription?.transcript?.trim();
+    if (!transcript) throw new Error('The voice recording could not be transcribed.');
+
+    const { data: advisory, error: advisoryError } = await supabase.functions.invoke('ask-ai', {
+      body: { question: transcript, language: currentLang },
+    });
+    if (advisoryError) throw advisoryError;
+
+    const voiceData = {
+      question: transcript,
+      query: transcript,
+      audioTranscript: transcript,
+      storageVoicePath,
+      aiDiagnosis: advisory.identifiedCondition,
+      aiConfidence: advisory.confidenceScore,
+      remedy: advisory.treatmentPlan,
+    };
+
+    let isEscalated = false;
+    try {
+      isEscalated = await persistQuery(voiceData, 'voice');
+    } catch (error) {
+      console.error('Unable to save voice advisory', error);
+      alert('Your voice advisory is ready, but it could not be saved to your query history. Please try again.');
+    }
+
+    setVoiceAnswer({ ...voiceData, isEscalated });
+    setVoiceState('done');
+  };
+
   const finishRecordedAudio = async () => {
     const mimeType = mediaRecorderRef.current?.mimeType || 'audio/webm';
     const extension = mimeType.includes('mp4') ? 'm4a' : 'webm';
@@ -148,14 +184,11 @@ export default function DemoPage() {
     try {
       const audioFile = new File([audioBlob], `krishi-voice-${Date.now()}.${extension}`, { type: mimeType });
       const storageVoicePath = await uploadVoiceRecording(audioFile, currentUser.id);
-      const vData = { ...mockData.voiceQuery, storageVoicePath };
-      const isEscalated = await persistQuery(vData, 'voice');
-      setVoiceAnswer({ ...vData, isEscalated });
-      setVoiceState('done');
+      await processVoiceQuery(storageVoicePath);
     } catch (error) {
-      console.error('Unable to upload recorded voice query', error);
+      console.error('Unable to process recorded voice query', error);
       setVoiceState('idle');
-      alert(error.message || 'The voice recording could not be uploaded.');
+      alert(error.message || 'The voice recording could not be processed.');
     } finally {
       mediaRecorderRef.current = null;
     }
@@ -207,28 +240,10 @@ export default function DemoPage() {
       if (e.target.files && e.target.files[0]) {
         const voiceFile = e.target.files[0];
         setVoiceState('processing');
-        uploadVoiceRecording(voiceFile, currentUser.id).then((storageVoicePath) => {
-          setTimeout(async () => {
-          setVoiceState('done');
-          const vData = {
-            ...mockData.voiceQuery,
-            queryType: 'Voice Query (Uploaded Audio)',
-            storageVoicePath,
-          };
-
-          let isEscalated = false;
-          try {
-            isEscalated = await persistQuery(vData, 'voice');
-          } catch (error) {
-            console.error('Unable to save query', error);
-          }
-
-          setVoiceAnswer({ ...vData, isEscalated });
-          }, 1200);
-        }).catch((error) => {
-          console.error('Unable to upload voice recording', error);
+        uploadVoiceRecording(voiceFile, currentUser.id).then(processVoiceQuery).catch((error) => {
+          console.error('Unable to process uploaded voice query', error);
           setVoiceState('idle');
-          alert(error.message || 'The voice recording could not be uploaded.');
+          alert(error.message || 'The voice recording could not be processed.');
         });
       }
     });
@@ -656,8 +671,8 @@ export default function DemoPage() {
 
                         <div className="space-y-3">
                           <div>
-                            <span className="text-xs font-bold uppercase text-gray-500 block mb-0.5">{t('aiPage.submittedQuestion')}</span>
-                            <p className="text-sm font-bold text-gray-900 italic">"{voiceAnswer.question || voiceAnswer.audioTranscript}"</p>
+                            <span className="text-xs font-bold uppercase text-gray-500 block mb-0.5">You said:</span>
+                            <p className="text-sm font-bold text-gray-900 italic">"{voiceAnswer.audioTranscript}"</p>
                           </div>
 
                           <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">

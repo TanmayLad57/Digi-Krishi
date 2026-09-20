@@ -49,6 +49,14 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: "AI service is not configured" }, 503);
     }
 
+    const languageMap: Record<string, string> = {
+      mr: "Marathi",
+      hi: "Hindi",
+      ml: "Malayalam",
+      en: "English",
+    };
+    const targetLanguage = languageMap[language.trim().toLowerCase().split("-")[0]] ?? language.trim();
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 25_000);
 
@@ -66,7 +74,7 @@ Deno.serve(async (request) => {
           messages: [
             {
               role: "system",
-              content: `You are an agricultural advisory assistant for Indian farmers. Respond in ${language.trim()}. Always return a JSON object with these exact fields: identifiedCondition (string), confidenceScore (number 0-100), treatmentPlan (string).`,
+              content: `You are an agricultural advisory assistant for Indian farmers. You MUST respond in ${targetLanguage} regardless of what language or script the input text appears to be written in. Both identifiedCondition and treatmentPlan MUST be written in ${targetLanguage}. Always return a JSON object with these exact fields: identifiedCondition (string), confidenceScore (number 0-100), treatmentPlan (string).`,
             },
             { role: "user", content: question.trim() },
           ],
@@ -94,9 +102,13 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: "AI service returned an invalid response" }, 502);
     }
 
+    const cleanedContent = content.replace(/```(?:json)?/gi, "").replace(/```/g, "").trim();
+    const jsonMatch = cleanedContent.match(/\{[\s\S]*\}/);
+    const rawJson = jsonMatch ? jsonMatch[0] : cleanedContent;
+
     let result: unknown;
     try {
-      result = JSON.parse(content);
+      result = JSON.parse(rawJson);
     } catch {
       return jsonResponse({ error: "AI service returned invalid JSON" }, 502);
     }
