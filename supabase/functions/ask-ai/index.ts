@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getFarmerContext } from "../_shared/weather.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -49,6 +50,9 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: "AI service is not configured" }, 503);
     }
 
+    const farmerContext = await getFarmerContext(supabase, user.id);
+    console.log(`[ask-ai] Farmer context for user ${user.id}: "${farmerContext}"`);
+
     const languageMap: Record<string, string> = {
       mr: "Marathi",
       hi: "Hindi",
@@ -74,7 +78,7 @@ Deno.serve(async (request) => {
           messages: [
             {
               role: "system",
-              content: `You are an agricultural advisory assistant for Indian farmers. You MUST respond in ${targetLanguage} regardless of what language or script the input text appears to be written in. Both identifiedCondition and treatmentPlan MUST be written in ${targetLanguage}. Always return a JSON object with these exact fields: identifiedCondition (string), confidenceScore (number 0-100), treatmentPlan (string).`,
+              content: `${farmerContext ? `${farmerContext} ` : ""}You are an agricultural advisory assistant for Indian farmers. You MUST respond in ${targetLanguage} regardless of what language or script the input text appears to be written in. Both identifiedCondition and treatmentPlan MUST be written in ${targetLanguage}. Always return a JSON object with these exact fields: identifiedCondition (string), confidenceScore (number 0-100), treatmentPlan (string).`,
             },
             { role: "user", content: question.trim() },
           ],

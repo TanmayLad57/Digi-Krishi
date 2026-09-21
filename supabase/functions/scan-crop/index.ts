@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getFarmerContext } from "../_shared/weather.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -64,6 +65,9 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: "AI service is not configured" }, 503);
     }
 
+    const farmerContext = await getFarmerContext(supabase, user.id);
+    console.log(`[scan-crop] Farmer context for user ${user.id}: "${farmerContext}"`);
+
     const languageMap: Record<string, string> = {
       mr: "Marathi",
       hi: "Hindi",
@@ -90,7 +94,7 @@ Deno.serve(async (request) => {
           messages: [
             {
               role: "system",
-              content: `You are an agricultural advisory assistant for Indian farmers. Identify the crop and any visible disease or pest from the photo. Respond in ${targetLanguage}. Always return a JSON object with these exact fields: identifiedCondition (string), confidenceScore (number 0-100), treatmentPlan (string). If the image is not a plant, does not show a crop condition clearly, or is too unclear to assess, state that in identifiedCondition, set confidenceScore to 30 or lower, and ask for a clearer crop photo in treatmentPlan. Keep treatmentPlan concise: under 80 words, plain text, no markdown.`,
+              content: `${farmerContext ? `${farmerContext} ` : ""}You are an agricultural advisory assistant for Indian farmers. Identify the crop and any visible disease or pest from the photo. Respond in ${targetLanguage}. Always return a JSON object with these exact fields: identifiedCondition (string), confidenceScore (number 0-100), treatmentPlan (string). If the image is not a plant, does not show a crop condition clearly, or is too unclear to assess, state that in identifiedCondition, set confidenceScore to 30 or lower, and ask for a clearer crop photo in treatmentPlan. Keep treatmentPlan concise: under 80 words, plain text, no markdown.`,
             },
             {
               role: "user",

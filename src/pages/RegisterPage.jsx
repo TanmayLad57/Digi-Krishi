@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sprout, UserCheck, ArrowRight, ArrowLeft, CheckCircle2, ShieldCheck, Droplets, Calendar, Layers } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 import { INDIA_STATES_DISTRICTS, POPULAR_CROPS } from '../data/locationData';
 import { registerFarmer, registerOfficer } from '../lib/auth';
 
@@ -17,7 +16,7 @@ export default function RegisterPage() {
   const [role, setRole] = useState(initialRole);
   const [step, setStep] = useState(1); // 1: Personal, 2: Location, 3: Crop/Officer details
 
-  // Farmer Form State
+  // Farmer Form State - starts genuinely empty so farmer actively chooses
   const [farmerForm, setFarmerForm] = useState({
     name: '',
     phone: '',
@@ -28,12 +27,12 @@ export default function RegisterPage() {
     taluka: '',
     village: '',
     pinCode: '',
-    primaryCrop: 'Paddy (Rice)',
-    secondaryCrop: 'Cotton',
-    cropStage: 'Vegetative Growth Stage',
-    irrigationType: 'Drip Irrigation System',
-    crops: ['Paddy (Rice)', 'Cotton'],
-    landArea: '4',
+    primaryCrop: '',
+    secondaryCrop: '',
+    cropStage: '',
+    irrigationType: '',
+    crops: [],
+    landArea: '',
   });
 
   // Officer Form State
@@ -43,14 +42,13 @@ export default function RegisterPage() {
     phone: '',
     officerId: '',
     password: '',
-    designation: 'KVK Agronomy Scientist',
-    department: 'Krishi Vigyan Kendra, Nagpur',
+    designation: '',
+    department: '',
     state: 'Maharashtra',
     district: 'Nagpur',
-    talukasCovered: 'Katol, Kalmeshwar',
+    talukasCovered: '',
   });
 
-  const { register } = useAuth();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -74,12 +72,90 @@ export default function RegisterPage() {
 
   const handleRoleChange = (newRole) => {
     setRole(newRole);
+    setSubmitError('');
     setStep(1);
+  };
+
+  const validateStep = (currentStep) => {
+    if (role === 'farmer') {
+      if (currentStep === 1) {
+        if (!farmerForm.name.trim()) return 'Please enter your full name.';
+        if (!farmerForm.phone.trim()) return 'Please enter your phone number.';
+        if (!farmerForm.password) return 'Please set a password.';
+      } else if (currentStep === 2) {
+        if (!farmerForm.state) return 'Please select your state.';
+        if (!farmerForm.district) return 'Please select your district.';
+      } else if (currentStep === 3) {
+        if (!farmerForm.primaryCrop) return 'Please select a primary crop.';
+        if (!farmerForm.cropStage) return 'Please select the current crop stage.';
+        if (!farmerForm.irrigationType) return 'Please select an irrigation source.';
+      }
+    } else {
+      if (currentStep === 1) {
+        if (!officerForm.name.trim()) return 'Please enter your full name.';
+        if (!officerForm.email.trim()) return 'Please enter your official email.';
+        if (!officerForm.officerId.trim()) return 'Please enter your officer/employee ID.';
+        if (!officerForm.password) return 'Please set a password.';
+      } else if (currentStep === 2) {
+        if (!officerForm.state) return 'Please select your assigned state.';
+        if (!officerForm.district) return 'Please select your assigned district.';
+      } else if (currentStep === 3) {
+        if (!officerForm.designation) return 'Please select your designation.';
+        if (!officerForm.department.trim()) return 'Please enter your department/KVK name.';
+      }
+    }
+    return '';
+  };
+
+  const handleNextStep = () => {
+    setSubmitError('');
+    const error = validateStep(step);
+    if (error) {
+      setSubmitError(error);
+      return;
+    }
+    setStep((prev) => Math.min(prev + 1, 3));
+  };
+
+  const goToStep = (targetStep) => {
+    setSubmitError('');
+    if (targetStep > step) {
+      for (let s = step; s < targetStep; s++) {
+        const error = validateStep(s);
+        if (error) {
+          setSubmitError(error);
+          return;
+        }
+      }
+    }
+    setStep(targetStep);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (step < 3) {
+        handleNextStep();
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError('');
+
+    // Ensure form is on the final step before submission
+    if (step < 3) {
+      handleNextStep();
+      return;
+    }
+
+    const error = validateStep(3);
+    if (error) {
+      setSubmitError(error);
+      return;
+    }
+
     setSubmitting(true);
     try {
       if (role === 'farmer') {
@@ -154,7 +230,7 @@ export default function RegisterPage() {
         <div className="grid grid-cols-3 gap-2 border-b border-gray-200 pb-4">
           <button
             type="button"
-            onClick={() => setStep(1)}
+            onClick={() => goToStep(1)}
             className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl font-bold text-xs transition-all ${
               step === 1
                 ? 'bg-[#1b4332] text-white shadow-md'
@@ -167,7 +243,7 @@ export default function RegisterPage() {
 
           <button
             type="button"
-            onClick={() => setStep(2)}
+            onClick={() => goToStep(2)}
             className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl font-bold text-xs transition-all ${
               step === 2
                 ? 'bg-[#1b4332] text-white shadow-md'
@@ -180,7 +256,7 @@ export default function RegisterPage() {
 
           <button
             type="button"
-            onClick={() => setStep(3)}
+            onClick={() => goToStep(3)}
             className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl font-bold text-xs transition-all ${
               step === 3
                 ? 'bg-[#1b4332] text-white shadow-md'
@@ -193,7 +269,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="space-y-4">
           <AnimatePresence mode="wait">
             
             {/* STEP 1: PERSONAL DETAILS */}
@@ -376,29 +452,48 @@ export default function RegisterPage() {
                   </>
                 ) : (
                   <>
-                    <div className="space-y-1">
-                      <label className="block text-xs font-bold text-gray-900 uppercase">Designation *</label>
-                      <select
-                        value={officerForm.designation}
-                        onChange={(e) => setOfficerForm({ ...officerForm, designation: e.target.value })}
-                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
-                      >
-                        <option value="Agriculture Officer">Agriculture Officer</option>
-                        <option value="Assistant Director of Agriculture">Assistant Director of Agriculture</option>
-                        <option value="KVK Agronomy Scientist">KVK Agronomy Scientist</option>
-                        <option value="District Extension Lead">District Extension Lead</option>
-                      </select>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="block text-xs font-bold text-gray-900 uppercase">Assigned State *</label>
+                        <select
+                          value={officerForm.state}
+                          onChange={(e) => setOfficerForm({ ...officerForm, state: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
+                        >
+                          {Object.keys(INDIA_STATES_DISTRICTS).map((st) => (
+                            <option key={st} value={st}>{st}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-xs font-bold text-gray-900 uppercase">Assigned District *</label>
+                        <select
+                          value={officerForm.district}
+                          onChange={(e) => setOfficerForm({ ...officerForm, district: e.target.value })}
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
+                        >
+                          {officerDistricts.map((dist) => (
+                            <option key={dist} value={dist}>{dist}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
 
                     <div className="space-y-1">
-                      <label className="block text-xs font-bold text-gray-900 uppercase">Department / KVK Name *</label>
+                      <label className="block text-xs font-bold text-gray-900 uppercase">Talukas Covered (Comma Separated):</label>
                       <input
                         type="text"
-                        value={officerForm.department}
-                        onChange={(e) => setOfficerForm({ ...officerForm, department: e.target.value })}
-                        placeholder="e.g. Krishi Vigyan Kendra, Nagpur"
+                        value={officerForm.talukasCovered}
+                        onChange={(e) => setOfficerForm({ ...officerForm, talukasCovered: e.target.value })}
+                        placeholder="e.g. Katol, Kalmeshwar, Narkhed"
                         className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
                       />
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs font-bold text-amber-900 flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-[#d97706] shrink-0" />
+                      <span>Note: Officer accounts undergo verification (simulated for demo).</span>
                     </div>
                   </>
                 )}
@@ -430,13 +525,16 @@ export default function RegisterPage() {
                             setFarmerForm((prev) => ({
                               ...prev,
                               primaryCrop: selected,
-                              crops: Array.from(new Set([selected, ...prev.crops])),
+                              crops: selected ? Array.from(new Set([selected, ...prev.crops])) : prev.crops,
                             }));
                           }}
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
+                          className={`w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold bg-white shadow-sm ${
+                            farmerForm.primaryCrop ? 'text-gray-900' : 'text-gray-400 font-semibold'
+                          }`}
                         >
+                          <option value="" disabled>Select Primary Crop</option>
                           {POPULAR_CROPS.map((crop) => (
-                            <option key={crop} value={crop}>
+                            <option key={crop} value={crop} className="text-gray-900 font-bold">
                               {crop}
                             </option>
                           ))}
@@ -455,14 +553,17 @@ export default function RegisterPage() {
                             setFarmerForm((prev) => ({
                               ...prev,
                               secondaryCrop: selected,
-                              crops: selected !== 'None' ? Array.from(new Set([...prev.crops, selected])) : prev.crops,
+                              crops: selected && selected !== 'None' ? Array.from(new Set([...prev.crops, selected])) : prev.crops,
                             }));
                           }}
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
+                          className={`w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold bg-white shadow-sm ${
+                            farmerForm.secondaryCrop ? 'text-gray-900' : 'text-gray-400 font-semibold'
+                          }`}
                         >
-                          <option value="None">None (Single Crop)</option>
+                          <option value="" disabled>Select Secondary / Intercrop</option>
+                          <option value="None" className="text-gray-900 font-bold">None (Single Crop)</option>
                           {POPULAR_CROPS.map((crop) => (
-                            <option key={crop} value={crop}>
+                            <option key={crop} value={crop} className="text-gray-900 font-bold">
                               {crop}
                             </option>
                           ))}
@@ -480,13 +581,16 @@ export default function RegisterPage() {
                         <select
                           value={farmerForm.cropStage}
                           onChange={(e) => setFarmerForm({ ...farmerForm, cropStage: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
+                          className={`w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold bg-white shadow-sm ${
+                            farmerForm.cropStage ? 'text-gray-900' : 'text-gray-400 font-semibold'
+                          }`}
                         >
-                          <option value="Sowing / Germination Stage">Sowing / Germination Stage</option>
-                          <option value="Vegetative Growth Stage">Vegetative Growth Stage</option>
-                          <option value="Flowering & Pod/Fruit Formation">Flowering & Pod Formation</option>
-                          <option value="Pre-Harvest / Ripening Stage">Pre-Harvest / Ripening Stage</option>
-                          <option value="Post-Harvest / Land Prep">Post-Harvest / Land Prep</option>
+                          <option value="" disabled>Select Crop Stage</option>
+                          <option value="Sowing / Germination Stage" className="text-gray-900 font-bold">Sowing / Germination Stage</option>
+                          <option value="Vegetative Growth Stage" className="text-gray-900 font-bold">Vegetative Growth Stage</option>
+                          <option value="Flowering & Pod/Fruit Formation" className="text-gray-900 font-bold">Flowering & Pod Formation</option>
+                          <option value="Pre-Harvest / Ripening Stage" className="text-gray-900 font-bold">Pre-Harvest / Ripening Stage</option>
+                          <option value="Post-Harvest / Land Prep" className="text-gray-900 font-bold">Post-Harvest / Land Prep</option>
                         </select>
                       </div>
 
@@ -498,13 +602,16 @@ export default function RegisterPage() {
                         <select
                           value={farmerForm.irrigationType}
                           onChange={(e) => setFarmerForm({ ...farmerForm, irrigationType: e.target.value })}
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white shadow-sm"
+                          className={`w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold bg-white shadow-sm ${
+                            farmerForm.irrigationType ? 'text-gray-900' : 'text-gray-400 font-semibold'
+                          }`}
                         >
-                          <option value="Drip Irrigation System">Drip Irrigation System</option>
-                          <option value="Monsoon / Rainfed">Monsoon / Rainfed</option>
-                          <option value="Canal / River Water">Canal / River Water</option>
-                          <option value="Borewell / Tube Well">Borewell / Tube Well</option>
-                          <option value="Sprinkler System">Sprinkler System</option>
+                          <option value="" disabled>Select Irrigation Source</option>
+                          <option value="Drip Irrigation System" className="text-gray-900 font-bold">Drip Irrigation System</option>
+                          <option value="Monsoon / Rainfed" className="text-gray-900 font-bold">Monsoon / Rainfed</option>
+                          <option value="Canal / River Water" className="text-gray-900 font-bold">Canal / River Water</option>
+                          <option value="Borewell / Tube Well" className="text-gray-900 font-bold">Borewell / Tube Well</option>
+                          <option value="Sprinkler System" className="text-gray-900 font-bold">Sprinkler System</option>
                         </select>
                       </div>
                     </div>
@@ -549,6 +656,36 @@ export default function RegisterPage() {
                   </>
                 ) : (
                   <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="block text-xs font-bold text-gray-900 uppercase">Designation *</label>
+                        <select
+                          value={officerForm.designation}
+                          onChange={(e) => setOfficerForm({ ...officerForm, designation: e.target.value })}
+                          className={`w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold bg-white shadow-sm ${
+                            officerForm.designation ? 'text-gray-900' : 'text-gray-400 font-semibold'
+                          }`}
+                        >
+                          <option value="" disabled>Select Designation</option>
+                          <option value="Agriculture Officer" className="text-gray-900 font-bold">Agriculture Officer</option>
+                          <option value="Assistant Director of Agriculture" className="text-gray-900 font-bold">Assistant Director of Agriculture</option>
+                          <option value="KVK Agronomy Scientist" className="text-gray-900 font-bold">KVK Agronomy Scientist</option>
+                          <option value="District Extension Lead" className="text-gray-900 font-bold">District Extension Lead</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-xs font-bold text-gray-900 uppercase">Department / KVK Name *</label>
+                        <input
+                          type="text"
+                          value={officerForm.department}
+                          onChange={(e) => setOfficerForm({ ...officerForm, department: e.target.value })}
+                          placeholder="e.g. Krishi Vigyan Kendra, Nagpur"
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
+                        />
+                      </div>
+                    </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1">
                         <label className="block text-xs font-bold text-gray-900 uppercase">Assigned State *</label>
@@ -610,7 +747,10 @@ export default function RegisterPage() {
             {step > 1 ? (
               <button
                 type="button"
-                onClick={() => setStep(step - 1)}
+                onClick={() => {
+                  setSubmitError('');
+                  setStep(step - 1);
+                }}
                 className="px-5 py-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs flex items-center gap-1"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -621,7 +761,7 @@ export default function RegisterPage() {
             {step < 3 ? (
               <button
                 type="button"
-                onClick={() => setStep(step + 1)}
+                onClick={handleNextStep}
                 className="px-6 py-2.5 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-xs flex items-center gap-1 shadow-sm ml-auto"
               >
                 <span>Next Step ({step === 1 ? 'Location' : role === 'farmer' ? 'Crop Context' : 'Jurisdiction'})</span>
