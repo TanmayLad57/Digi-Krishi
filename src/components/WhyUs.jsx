@@ -60,11 +60,11 @@ export default function WhyUs() {
                 <img
                   src="/images/officer.png"
                   alt="Agriculture extension officer collaborating with farmer in field"
-                  className="w-full h-[400px] sm:h-[480px] object-cover"
+                  className="w-full h-[300px] sm:h-[480px] object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1b4332]/70 via-transparent to-transparent" />
                 
-                <div className="absolute bottom-6 left-6 right-6 text-white space-y-1">
+                <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 text-white space-y-1">
                   <span className="text-xs uppercase font-bold tracking-wider text-[#e9c46a]">Human + AI Synergy</span>
                   <h4 className="font-serif-display text-xl font-bold">Bridge to Real Extension Officers</h4>
                   <p className="text-xs text-gray-200 font-body">Combining machine intelligence with boots-on-the-ground farming expertise.</p>

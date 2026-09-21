@@ -148,8 +148,8 @@ export default function OfficerCaseDetailPage() {
         <div className="lg:col-span-7 space-y-6">
           
           {/* 1. Farmer Info Panel */}
-          <div className="bg-white p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+          <div className="bg-white p-4 sm:p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-gray-100 pb-3 gap-2 sm:gap-0">
               <span className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Sprout className="w-4 h-4 text-[#1b4332]" />
                 Farmer Profile Context
@@ -190,7 +190,7 @@ export default function OfficerCaseDetailPage() {
           </div>
 
           {/* 2. Original Farmer Query */}
-          <div className="bg-white p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-4">
+          <div className="bg-white p-4 sm:p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-4">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <span className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
                 <MessageSquareText className="w-4 h-4 text-[#d97706]" />
@@ -254,7 +254,7 @@ export default function OfficerCaseDetailPage() {
           </div>
 
           {/* 3. AI Analysis & Escalation Reason */}
-          <div className="bg-[#faf8f5] p-6 rounded-3xl border-2 border-[#1b4332]/20 shadow-sm space-y-3">
+          <div className="bg-[#faf8f5] p-4 sm:p-6 rounded-3xl border-2 border-[#1b4332]/20 shadow-sm space-y-3">
             <div className="flex items-center justify-between border-b border-gray-200 pb-2">
               <span className="text-xs font-bold text-[#1b4332] uppercase tracking-wider flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-[#d97706]" />
@@ -284,7 +284,7 @@ export default function OfficerCaseDetailPage() {
         <div className="lg:col-span-5 space-y-6">
           
           {/* Officer Response Workspace */}
-          <div className="bg-white p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-4">
+          <div className="bg-white p-4 sm:p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-4">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <span className="text-xs font-bold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
                 <UserCheck className="w-4 h-4 text-[#1b4332]" />
@@ -354,7 +354,7 @@ export default function OfficerCaseDetailPage() {
           </div>
 
           {/* Case Activity Timeline Log */}
-          <div className="bg-white p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-4">
+          <div className="bg-white p-4 sm:p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-4">
             <div className="text-xs font-bold text-gray-900 uppercase border-b border-gray-100 pb-2 flex items-center gap-1.5">
               <Clock className="w-4 h-4 text-[#1b4332]" />
               Case Activity Timeline & Audit Log

@@ -178,7 +178,7 @@ export default function RegisterPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-xl bg-white rounded-3xl p-6 sm:p-8 border-2 border-gray-200 shadow-xl space-y-6"
+        className="w-full max-w-xl bg-white rounded-3xl p-4 sm:p-8 border-2 border-gray-200 shadow-xl space-y-6"
       >
         {/* Brand Header */}
         <div className="text-center space-y-2">
@@ -202,69 +202,69 @@ export default function RegisterPage() {
           <button
             type="button"
             onClick={() => handleRoleChange('farmer')}
-            className={`py-2.5 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2.5 px-2 sm:px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
               role === 'farmer'
                 ? 'bg-[#1b4332] text-white shadow-md'
                 : 'text-gray-700 hover:text-gray-900'
             }`}
           >
             <Sprout className="w-3.5 h-3.5 text-[#e9c46a]" />
-            <span>Kisan / Farmer Account</span>
+            <span>Kisan / Farmer</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleRoleChange('officer')}
-            className={`py-2.5 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2.5 px-2 sm:px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
               role === 'officer'
                 ? 'bg-[#1b4332] text-white shadow-md'
                 : 'text-gray-700 hover:text-gray-900'
             }`}
           >
             <UserCheck className="w-3.5 h-3.5 text-[#e9c46a]" />
-            <span>Ag-Officer Account</span>
+            <span>Ag-Officer</span>
           </button>
         </div>
 
         {/* Interactive Stepper Navigation Bar */}
-        <div className="grid grid-cols-3 gap-2 border-b border-gray-200 pb-4">
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2 border-b border-gray-200 pb-4">
           <button
             type="button"
             onClick={() => goToStep(1)}
-            className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl font-bold text-xs transition-all ${
+            className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 sm:px-2 rounded-xl font-bold text-[11px] sm:text-xs transition-all ${
               step === 1
                 ? 'bg-[#1b4332] text-white shadow-md'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${step === 1 ? 'bg-white/20 text-white' : 'bg-gray-300 text-gray-800'}`}>1</span>
-            <span className="truncate">Personal Info</span>
+            <span className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 ${step === 1 ? 'bg-white/20 text-white' : 'bg-gray-300 text-gray-800'}`}>1</span>
+            <span className="truncate">Personal</span>
           </button>
 
           <button
             type="button"
             onClick={() => goToStep(2)}
-            className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl font-bold text-xs transition-all ${
+            className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 sm:px-2 rounded-xl font-bold text-[11px] sm:text-xs transition-all ${
               step === 2
                 ? 'bg-[#1b4332] text-white shadow-md'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${step === 2 ? 'bg-white/20 text-white' : 'bg-gray-300 text-gray-800'}`}>2</span>
+            <span className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 ${step === 2 ? 'bg-white/20 text-white' : 'bg-gray-300 text-gray-800'}`}>2</span>
             <span className="truncate">Location</span>
           </button>
 
           <button
             type="button"
             onClick={() => goToStep(3)}
-            className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl font-bold text-xs transition-all ${
+            className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 sm:px-2 rounded-xl font-bold text-[11px] sm:text-xs transition-all ${
               step === 3
                 ? 'bg-[#1b4332] text-white shadow-md'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${step === 3 ? 'bg-white/20 text-white' : 'bg-gray-300 text-gray-800'}`}>3</span>
-            <span className="truncate">{role === 'farmer' ? 'Crop Context' : 'Jurisdiction'}</span>
+            <span className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 ${step === 3 ? 'bg-white/20 text-white' : 'bg-gray-300 text-gray-800'}`}>3</span>
+            <span className="truncate">{role === 'farmer' ? 'Crops' : 'Details'}</span>
           </button>
         </div>
 

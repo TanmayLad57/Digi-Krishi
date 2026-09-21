@@ -65,7 +65,7 @@ export default function OfficerCasesPage() {
             <ClipboardList className="w-4 h-4 text-[#d97706]" />
             <span>KVK Extension Cases Queue</span>
           </div>
-          <h1 className="font-serif-display text-3xl sm:text-4xl font-bold text-[#111827]">
+          <h1 className="font-serif-display text-2xl sm:text-4xl font-bold text-[#111827] break-words">
             Escalated Farmer Cases
           </h1>
           <p className="text-xs sm:text-sm text-gray-600 font-body">
@@ -80,7 +80,7 @@ export default function OfficerCasesPage() {
       </div>
 
       {/* Filter & Sort Bar */}
-      <div className="bg-white p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-4">
+      <div className="bg-white p-4 sm:p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-4">
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
           
           {/* Search Box */}
@@ -182,13 +182,13 @@ export default function OfficerCasesPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               onClick={() => navigate(`/officer-dashboard/cases/${c.id}`)}
-              className="bg-white rounded-3xl p-6 border-2 border-gray-200 hover:border-[#1b4332] shadow-sm hover:shadow-md transition-all cursor-pointer space-y-4 group"
+              className="bg-white rounded-3xl p-4 sm:p-6 border-2 border-gray-200 hover:border-[#1b4332] shadow-sm hover:shadow-md transition-all cursor-pointer space-y-4 group"
             >
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 
                 {/* Farmer & Crop Info */}
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-serif-display text-lg font-bold text-gray-900 group-hover:text-[#1b4332] transition-colors">
                       {c.farmerName}
                     </h3>
@@ -265,7 +265,7 @@ export default function OfficerCasesPage() {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 self-end sm:self-auto">
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 self-end sm:self-auto">
                   <a
                     href={`tel:${c.farmerPhone}`}
                     onClick={(e) => e.stopPropagation()}

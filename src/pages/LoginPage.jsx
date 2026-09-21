@@ -74,7 +74,7 @@ export default function LoginPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-md bg-white rounded-3xl p-8 border-2 border-gray-200 shadow-xl space-y-6"
+        className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 border-2 border-gray-200 shadow-xl space-y-6"
       >
         
         {/* Brand Header */}

@@ -56,16 +56,16 @@ export default function FarmerDashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Welcome Header */}
-        <div className="bg-white p-6 sm:p-8 rounded-3xl border-2 border-gray-200 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="bg-white p-4 sm:p-8 rounded-3xl border-2 border-gray-200 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1b4332]/10 text-[#1b4332] text-xs font-bold uppercase tracking-wider">
               <Sprout className="w-4 h-4 text-[#d97706]" />
               <span>{t('dashboard.kisanPortal')}</span>
             </div>
-            <h1 className="font-serif-display text-3xl sm:text-4xl font-bold text-[#111827]">
+            <h1 className="font-serif-display text-2xl sm:text-4xl font-bold text-[#111827] break-words">
               {t('dashboard.greeting')} {currentUser?.name || 'Rajesh Patil'}!
             </h1>
-            <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-gray-600">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-semibold text-gray-600">
               <span className="flex items-center gap-1">
                 <MapPin className="w-4 h-4 text-[#1b4332]" />
                 {currentUser?.district || 'Nagpur'}, {currentUser?.state || 'Maharashtra'}
@@ -87,30 +87,30 @@ export default function FarmerDashboardPage() {
         </div>
 
         {/* Quick Summary Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          <div className="bg-white p-4 sm:p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-2">
             <div className="text-xs font-bold text-gray-500 uppercase">{t('dashboard.totalQueryHistory')}</div>
-            <div className="font-serif-display text-3xl font-bold text-[#1b4332]">
+            <div className="font-serif-display text-2xl sm:text-3xl font-bold text-[#1b4332]">
               {history.length} {t('dashboard.savedRecords')}
             </div>
             <p className="text-xs text-gray-600">{t('dashboard.clickRecordHint')}</p>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-2">
+          <div className="bg-white p-4 sm:p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-2">
             <div className="text-xs font-bold text-gray-500 uppercase">{t('dashboard.districtForecast')}</div>
-            <div className="font-serif-display text-3xl font-bold text-[#d97706]">{t('dashboard.rainForecast')}</div>
+            <div className="font-serif-display text-2xl sm:text-3xl font-bold text-[#d97706]">{t('dashboard.rainForecast')}</div>
             <p className="text-xs text-gray-600">{t('dashboard.sprayAdvisoryActive')}</p>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-2">
+          <div className="bg-white p-4 sm:p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-2">
             <div className="text-xs font-bold text-gray-500 uppercase">{t('dashboard.pmKisanStatusTitle')}</div>
-            <div className="font-serif-display text-3xl font-bold text-emerald-800">{t('dashboard.pmKisanStatusDetail')}</div>
+            <div className="font-serif-display text-2xl sm:text-3xl font-bold text-emerald-800">{t('dashboard.pmKisanStatusDetail')}</div>
             <p className="text-xs text-emerald-900 font-semibold">{t('dashboard.pmKisanStatusSub')}</p>
           </div>
         </div>
 
         {/* Saved Advisory Reports (Clickable Accordion) */}
-        <div className="bg-white p-6 sm:p-8 rounded-3xl border-2 border-gray-200 shadow-md space-y-6">
+        <div className="bg-white p-4 sm:p-8 rounded-3xl border-2 border-gray-200 shadow-md space-y-6">
           <div className="flex items-center justify-between border-b border-gray-200 pb-4">
             <div className="space-y-1">
               <h3 className="font-serif-display text-2xl font-bold text-[#111827]">

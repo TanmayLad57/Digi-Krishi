@@ -144,17 +144,17 @@ export default function Navbar() {
           
           {/* Left: Logo & Brand Identity */}
           <div className="flex-1 flex items-center justify-start min-w-0">
-            <Link to="/" className="flex items-center gap-3 group shrink-0" aria-label="Digi Krishi Home">
+            <Link to="/" className="flex items-center gap-2 sm:gap-3 group shrink-0" aria-label="Digi Krishi Home">
               <img
                 src="/images/logo.png"
                 alt="Digi Krishi Logo"
-                className="h-10 sm:h-11 w-auto rounded-xl object-contain shadow-sm group-hover:opacity-90 transition-opacity"
+                className="h-9 sm:h-11 w-auto rounded-xl object-contain shadow-sm group-hover:opacity-90 transition-opacity"
               />
               <div className="flex flex-col">
-                <span className="font-serif-display text-xl sm:text-2xl font-bold tracking-tight text-[#111827] leading-none">
+                <span className="font-serif-display text-lg sm:text-2xl font-bold tracking-tight text-[#111827] leading-none">
                   {t('navbar.brandName')}
                 </span>
-                <span className="text-[10px] uppercase font-bold tracking-wider text-[#1b4332] mt-0.5">
+                <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-[#1b4332] mt-0.5">
                   {t('navbar.brandTagline')}
                 </span>
               </div>
@@ -381,12 +381,12 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Right Controls: Language Selector + Hamburger */}
-            <div className="flex lg:hidden items-center gap-2">
+            <div className="flex lg:hidden items-center gap-1.5 sm:gap-2">
               {/* Mobile Language Selector Pill */}
               <div className="relative">
                 <button
                   onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-gray-300 text-xs font-bold text-gray-800"
+                  className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl bg-white border border-gray-300 text-xs font-bold text-gray-800"
                 >
                   <Globe className="w-3.5 h-3.5 text-[#1b4332]" />
                   <span>{currentLangObj.label}</span>
@@ -421,22 +421,22 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <Link
                   to={currentUser.role === 'officer' ? '/officer-dashboard' : '/farmer-dashboard'}
-                  className="w-8 h-8 rounded-full bg-[#1b4332] text-[#e9c46a] font-bold text-xs flex items-center justify-center"
+                  className="w-8 h-8 rounded-full bg-[#1b4332] text-[#e9c46a] font-bold text-xs flex items-center justify-center shrink-0"
                 >
                   {currentUser.name.charAt(0)}
                 </Link>
               ) : (
-                <Link to="/login" className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#1b4332] text-white">
+                <Link to="/login" className="text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#1b4332] text-white shrink-0">
                   {t('navbar.signIn')}
                 </Link>
               )}
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-xl bg-white border border-gray-300 text-gray-800"
+                className="p-1.5 sm:p-2 rounded-xl bg-white border border-gray-300 text-gray-800 shrink-0"
                 aria-label="Toggle menu"
               >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
               </button>
             </div>
           </div>

@@ -26,8 +26,8 @@ export default function Footer() {
               {t('footer.tagline')}
             </p>
 
-            <div className="flex items-center gap-2 text-xs text-[#74c69d] font-semibold bg-[#1c352b] px-3.5 py-2 rounded-xl w-fit border border-[#2d6a4f]/40">
-              <Globe className="w-4 h-4 text-[#e9c46a]" />
+            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 text-[11px] sm:text-xs text-[#74c69d] font-semibold bg-[#1c352b] px-3 sm:px-3.5 py-2 rounded-xl max-w-full border border-[#2d6a4f]/40">
+              <Globe className="w-4 h-4 text-[#e9c46a] shrink-0" />
               <span>Languages Supported: English • हिंदी • मराठी • മലയാളം</span>
             </div>
           </div>

@@ -78,7 +78,7 @@ export default function KeyCapabilities() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-16 gap-4 md:gap-6">
           <div className="max-w-2xl space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#d97706]/10 text-[#d97706] text-xs font-bold uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5" />
@@ -108,7 +108,7 @@ export default function KeyCapabilities() {
                 key={cap.id}
                 variants={cardVariants}
                 whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                className="group relative rounded-3xl p-7 flex flex-col justify-between transition-all duration-300 bg-white border border-[#2d6a4f]/15 hover:border-[#2d6a4f]/40 shadow-sm hover:shadow-xl"
+                className="group relative rounded-3xl p-5 sm:p-7 flex flex-col justify-between transition-all duration-300 bg-white border border-[#2d6a4f]/15 hover:border-[#2d6a4f]/40 shadow-sm hover:shadow-xl"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">

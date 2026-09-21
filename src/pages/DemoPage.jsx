@@ -369,10 +369,10 @@ export default function DemoPage() {
             <Sparkles className="w-4 h-4 text-[#d97706]" />
             <span>{t('aiPage.tagline')}</span>
           </div>
-          <h1 className="font-serif-display text-4xl sm:text-5xl font-bold text-[#111827]">
+          <h1 className="font-serif-display text-2xl sm:text-4xl lg:text-5xl font-bold text-[#111827] break-words">
             {t('aiPage.title')}
           </h1>
-          <p className="text-base sm:text-lg text-gray-700 font-body leading-relaxed">
+          <p className="text-sm sm:text-lg text-gray-700 font-body leading-relaxed">
             {t('aiPage.subtitle')}
           </p>
         </div>
@@ -391,7 +391,7 @@ export default function DemoPage() {
                   onClick={() => {
                     setActiveTab(tab.id);
                   }}
-                  className={`py-4 px-3 flex flex-col items-center justify-center gap-1.5 text-xs sm:text-sm font-bold border-b-4 transition-all cursor-pointer ${
+                  className={`py-3 px-2 sm:py-4 sm:px-3 flex flex-col items-center justify-center gap-1.5 text-xs sm:text-sm font-bold border-b-4 transition-all cursor-pointer ${
                     isActive
                       ? 'border-[#1b4332] text-[#1b4332] bg-white shadow-sm'
                       : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -410,7 +410,7 @@ export default function DemoPage() {
           </div>
 
           {/* Tab Contents */}
-          <div className="p-6 sm:p-8">
+          <div className="p-4 sm:p-8">
             <AnimatePresence mode="wait">
               
               {/* TAB 1: ASK AI (TEXT INPUT) */}
@@ -481,7 +481,7 @@ export default function DemoPage() {
                     <motion.div
                       initial={{ opacity: 0, y: 15 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-[#faf8f5] p-6 rounded-2xl border-2 border-[#1b4332]/20 space-y-4 shadow-sm"
+                      className="bg-[#faf8f5] p-4 sm:p-6 rounded-2xl border-2 border-[#1b4332]/20 space-y-4 shadow-sm"
                     >
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-gray-200 pb-3 gap-2">
                         <div className="flex items-center gap-2">
@@ -565,7 +565,7 @@ export default function DemoPage() {
                   className="space-y-6"
                 >
                   {voiceState === 'idle' && (
-                    <div className="p-8 sm:p-12 rounded-3xl border-2 border-dashed border-gray-300 bg-gray-50 text-center space-y-6">
+                    <div className="p-5 sm:p-12 rounded-3xl border-2 border-dashed border-gray-300 bg-gray-50 text-center space-y-6">
                       <div className="w-16 h-16 rounded-full bg-amber-100 text-[#d97706] flex items-center justify-center mx-auto shadow-sm">
                         <Mic className="w-8 h-8" />
                       </div>
@@ -598,7 +598,7 @@ export default function DemoPage() {
                   )}
 
                   {voiceState === 'recording' && (
-                    <div className="p-10 rounded-3xl border-2 border-[#d97706] bg-amber-50 text-center space-y-4">
+                    <div className="p-6 sm:p-10 rounded-3xl border-2 border-[#d97706] bg-amber-50 text-center space-y-4">
                       <div className="w-16 h-16 rounded-full bg-[#d97706] text-white flex items-center justify-center mx-auto animate-pulse shadow-lg">
                         <Mic className="w-8 h-8" />
                       </div>
@@ -618,7 +618,7 @@ export default function DemoPage() {
                   )}
 
                   {voiceState === 'processing' && (
-                    <div className="p-10 rounded-3xl border-2 border-gray-300 bg-gray-50 text-center space-y-3">
+                    <div className="p-6 sm:p-10 rounded-3xl border-2 border-gray-300 bg-gray-50 text-center space-y-3">
                       <RefreshCw className="w-10 h-10 text-[#1b4332] animate-spin mx-auto" />
                       <h4 className="text-sm font-bold text-gray-800">{t('aiPage.voiceProcessing')}</h4>
                     </div>
@@ -653,7 +653,7 @@ export default function DemoPage() {
                         </div>
                       )}
 
-                      <div className="bg-[#faf8f5] p-6 rounded-2xl border-2 border-[#1b4332]/20 space-y-4">
+                      <div className="bg-[#faf8f5] p-4 sm:p-6 rounded-2xl border-2 border-[#1b4332]/20 space-y-4">
                         <div className="flex items-center justify-between border-b border-gray-200 pb-3">
                           <div className="flex items-center gap-2">
                             <div className="w-7 h-7 rounded-lg bg-[#1b4332] text-[#e9c46a] flex items-center justify-center">
@@ -705,7 +705,7 @@ export default function DemoPage() {
                   className="space-y-6"
                 >
                   {scanState === 'idle' && (
-                    <div className="p-8 sm:p-12 rounded-3xl border-2 border-dashed border-gray-300 bg-gray-50 text-center space-y-6">
+                    <div className="p-5 sm:p-12 rounded-3xl border-2 border-dashed border-gray-300 bg-gray-50 text-center space-y-6">
                       <div className="w-16 h-16 rounded-full bg-[#1b4332]/10 text-[#1b4332] flex items-center justify-center mx-auto shadow-sm">
                         <Camera className="w-8 h-8" />
                       </div>
@@ -756,7 +756,7 @@ export default function DemoPage() {
                   )}
 
                   {scanState === 'scanning' && (
-                    <div className="p-12 rounded-3xl border-2 border-[#1b4332] bg-gray-50 text-center space-y-4">
+                    <div className="p-6 sm:p-12 rounded-3xl border-2 border-[#1b4332] bg-gray-50 text-center space-y-4">
                       <RefreshCw className="w-12 h-12 text-[#1b4332] animate-spin mx-auto" />
                       <div className="space-y-1">
                         <h4 className="font-serif-display text-xl font-bold text-gray-900">{t('aiPage.scanningText')}</h4>
@@ -944,7 +944,7 @@ export default function DemoPage() {
               initial={{ opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.94 }}
-              className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border-2 border-gray-200 space-y-5 text-center relative"
+              className="bg-white rounded-3xl p-5 sm:p-8 max-w-md w-full shadow-2xl border-2 border-gray-200 space-y-5 text-center relative"
             >
               <button
                 onClick={() => setShowAuthGateModal(false)}

@@ -15,7 +15,7 @@ export default function CtaBanner() {
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#1b4332] via-[#2d6a4f] to-[#132a22] text-white p-8 sm:p-12 lg:p-16 shadow-2xl border border-[#40916c]/30 text-center"
+          className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#1b4332] via-[#2d6a4f] to-[#132a22] text-white p-6 sm:p-12 lg:p-16 shadow-2xl border border-[#40916c]/30 text-center"
         >
           {/* Subtle background wheat graphic lines */}
           <div className="absolute top-0 right-0 -mt-12 -mr-12 w-80 h-80 bg-[#e9c46a]/10 rounded-full blur-3xl pointer-events-none" />

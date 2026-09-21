@@ -42,14 +42,14 @@ export default function OfficerDashboardPage() {
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white p-6 sm:p-8 rounded-3xl border-2 border-gray-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6"
+        className="bg-white p-4 sm:p-8 rounded-3xl border-2 border-gray-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6"
       >
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1b4332]/10 text-[#1b4332] text-xs font-bold uppercase tracking-wider">
             <UserCheck className="w-4 h-4 text-[#d97706]" />
             <span>Krishi Vigyan Kendra Extension Portal</span>
           </div>
-          <h1 className="font-serif-display text-3xl sm:text-4xl font-bold text-[#111827]">
+          <h1 className="font-serif-display text-2xl sm:text-4xl font-bold text-[#111827] break-words">
             Welcome back, {currentUser?.name || 'Dr. Sunita Sharma'} 👋
           </h1>
           <p className="text-xs sm:text-sm text-gray-600 font-body flex flex-wrap items-center gap-2 font-semibold">
@@ -72,49 +72,49 @@ export default function OfficerDashboardPage() {
       </motion.div>
 
       {/* Clean Stat Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-3xl border-2 border-amber-200 shadow-sm space-y-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="bg-white p-4 sm:p-6 rounded-3xl border-2 border-amber-200 shadow-sm space-y-2">
           <div className="flex items-center justify-between text-xs font-bold text-amber-900 uppercase">
             <span>Pending Cases</span>
             <Clock className="w-4 h-4 text-[#d97706]" />
           </div>
-          <div className="font-serif-display text-4xl font-bold text-[#111827]">{pendingCount}</div>
+          <div className="font-serif-display text-3xl sm:text-4xl font-bold text-[#111827]">{pendingCount}</div>
           <p className="text-xs text-amber-800 font-semibold">Requires officer review</p>
         </div>
 
-        <div className="bg-white p-6 rounded-3xl border-2 border-red-200 shadow-sm space-y-2">
+        <div className="bg-white p-4 sm:p-6 rounded-3xl border-2 border-red-200 shadow-sm space-y-2">
           <div className="flex items-center justify-between text-xs font-bold text-red-900 uppercase">
             <span>High Priority</span>
             <AlertTriangle className="w-4 h-4 text-red-600" />
           </div>
-          <div className="font-serif-display text-4xl font-bold text-red-600">{highPriorityCount}</div>
+          <div className="font-serif-display text-3xl sm:text-4xl font-bold text-red-600">{highPriorityCount}</div>
           <p className="text-xs text-red-700 font-semibold">Outbreak & low AI confidence</p>
         </div>
 
-        <div className="bg-white p-6 rounded-3xl border-2 border-emerald-200 shadow-sm space-y-2">
+        <div className="bg-white p-4 sm:p-6 rounded-3xl border-2 border-emerald-200 shadow-sm space-y-2">
           <div className="flex items-center justify-between text-xs font-bold text-emerald-900 uppercase">
             <span>Resolved This Month</span>
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="font-serif-display text-4xl font-bold text-[#1b4332]">{resolvedCount}</div>
+          <div className="font-serif-display text-3xl sm:text-4xl font-bold text-[#1b4332]">{resolvedCount}</div>
           <p className="text-xs text-emerald-800 font-semibold">98.2% farmer rating</p>
         </div>
 
-        <div className="bg-white p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-2">
+        <div className="bg-white p-4 sm:p-6 rounded-3xl border-2 border-gray-200 shadow-sm space-y-2">
           <div className="flex items-center justify-between text-xs font-bold text-gray-500 uppercase">
             <span>Avg Response Time</span>
             <TrendingUp className="w-4 h-4 text-[#1b4332]" />
           </div>
-          <div className="font-serif-display text-4xl font-bold text-gray-900">4.2 hrs</div>
+          <div className="font-serif-display text-3xl sm:text-4xl font-bold text-gray-900">4.2 hrs</div>
           <p className="text-xs text-gray-600 font-semibold">Target &lt; 6 hrs achieved</p>
         </div>
       </div>
 
       {/* Main Grid: Recent Escalations Preview + Simple Analytics */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
         
         {/* Left Column (8 cols): Recent Escalations Table */}
-        <div className="lg:col-span-8 bg-white p-6 sm:p-8 rounded-3xl border-2 border-gray-200 shadow-sm space-y-6">
+        <div className="lg:col-span-8 bg-white p-4 sm:p-8 rounded-3xl border-2 border-gray-200 shadow-sm space-y-6">
           <div className="flex items-center justify-between border-b border-gray-200 pb-4">
             <div>
               <h2 className="font-serif-display text-2xl font-bold text-[#111827]">

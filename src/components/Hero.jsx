@@ -24,7 +24,7 @@ export default function Hero() {
             </div>
 
             {/* Main Heading */}
-            <h1 className="font-serif-display text-4xl sm:text-5xl lg:text-6xl tracking-tight text-[#1b4332] font-bold leading-[1.12]">
+            <h1 className="font-serif-display text-3xl sm:text-5xl lg:text-6xl tracking-tight text-[#1b4332] font-bold leading-[1.15] break-words">
               {t('hero.headlineMain')}{' '}
               <span className="relative inline-block text-[#d97706]">
                 {t('hero.headlineHighlight')}
@@ -35,12 +35,12 @@ export default function Hero() {
             </h1>
 
             {/* Supporting Subtext */}
-            <p className="text-lg sm:text-xl text-gray-700 font-body max-w-2xl font-normal leading-relaxed">
+            <p className="text-base sm:text-xl text-gray-700 font-body max-w-2xl font-normal leading-relaxed">
               {t('hero.subtext')}
             </p>
 
             {/* Core Interaction Modalities Chips */}
-            <div className="flex flex-wrap gap-2.5 pt-1">
+            <div className="flex flex-wrap gap-2 sm:gap-2.5 pt-1">
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/80 border border-gray-200 text-xs font-medium text-gray-700 shadow-sm">
                 <Mic className="w-3.5 h-3.5 text-[#d97706]" />
                 <span>{t('hero.voiceChip')}</span>
@@ -56,7 +56,7 @@ export default function Hero() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-3">
               <a
                 href="#interactive-demo"
                 className="inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-semibold text-base shadow-lg shadow-[#1b4332]/25 hover:translate-y-[-2px] transition-all"
@@ -74,18 +74,18 @@ export default function Hero() {
             </div>
 
             {/* Trust metrics bar */}
-            <div className="pt-6 border-t border-[#2d6a4f]/15 grid grid-cols-3 gap-4">
+            <div className="pt-6 border-t border-[#2d6a4f]/15 grid grid-cols-3 gap-2 sm:gap-4">
               <div>
-                <div className="font-serif-display text-2xl sm:text-3xl font-bold text-[#1b4332]">{t('hero.statQueries')}</div>
-                <div className="text-xs text-gray-600 font-medium">{t('hero.statQueriesLabel')}</div>
+                <div className="font-serif-display text-xl sm:text-3xl font-bold text-[#1b4332]">{t('hero.statQueries')}</div>
+                <div className="text-[10px] sm:text-xs text-gray-600 font-medium">{t('hero.statQueriesLabel')}</div>
               </div>
               <div>
-                <div className="font-serif-display text-2xl sm:text-3xl font-bold text-[#2d6a4f]">{t('hero.statAccuracy')}</div>
-                <div className="text-xs text-gray-600 font-medium">{t('hero.statAccuracyLabel')}</div>
+                <div className="font-serif-display text-xl sm:text-3xl font-bold text-[#2d6a4f]">{t('hero.statAccuracy')}</div>
+                <div className="text-[10px] sm:text-xs text-gray-600 font-medium">{t('hero.statAccuracyLabel')}</div>
               </div>
               <div>
-                <div className="font-serif-display text-2xl sm:text-3xl font-bold text-[#d97706]">{t('hero.statFree')}</div>
-                <div className="text-xs text-gray-600 font-medium">{t('hero.statFreeLabel')}</div>
+                <div className="font-serif-display text-xl sm:text-3xl font-bold text-[#d97706]">{t('hero.statFree')}</div>
+                <div className="text-[10px] sm:text-xs text-gray-600 font-medium">{t('hero.statFreeLabel')}</div>
               </div>
             </div>
 
@@ -99,14 +99,14 @@ export default function Hero() {
                 <img
                   src="/images/hero.png"
                   alt="Indian farmer holding smartphone in green field with AI technology overlay"
-                  className="w-full h-[420px] sm:h-[480px] object-cover object-center transform hover:scale-105 transition-transform duration-700"
+                  className="w-full h-[360px] sm:h-[480px] object-cover object-center transform hover:scale-105 transition-transform duration-700"
                 />
                 
                 {/* Gradient vignette overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#132a22]/80 via-transparent to-transparent" />
                 
                 {/* Bottom Card Overlay inside image */}
-                <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-[#2d6a4f]/20 shadow-xl">
+                <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 bg-white/95 backdrop-blur-md p-3.5 sm:p-4 rounded-2xl border border-[#2d6a4f]/20 shadow-xl">
                   <div className="flex items-start gap-3">
                     <div className="w-9 h-9 rounded-xl bg-[#2d6a4f] flex items-center justify-center text-white shrink-0 mt-0.5">
                       <Sprout className="w-5 h-5 text-[#e9c46a]" />
@@ -129,7 +129,7 @@ export default function Hero() {
               </div>
 
               {/* Top Floating Badge */}
-              <div className="absolute -top-5 -left-4 sm:-left-6 bg-white px-4 py-2.5 rounded-2xl shadow-xl border border-[#2d6a4f]/20 flex items-center gap-3">
+              <div className="absolute -top-4 sm:-top-5 left-2 sm:-left-6 bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-xl border border-[#2d6a4f]/20 flex items-center gap-2.5 sm:gap-3">
                 <div className="w-8 h-8 rounded-full bg-[#d97706]/15 flex items-center justify-center text-[#d97706]">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
