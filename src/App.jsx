@@ -30,7 +30,7 @@ function AnimatedRoutes() {
       {/* Hide marketing Navbar & Footer when inside Officer Work Tool Workspace */}
       {!isOfficerWorkspace && <Navbar />}
 
-      <main className="flex-grow" style={{ opacity: 1, visibility: 'visible' }}>
+      <main className="grow-0 sm:flex-grow" style={{ opacity: 1, visibility: 'visible' }}>
         <div key={location.pathname} style={{ opacity: 1, visibility: 'visible' }}>
           <Routes location={location}>
             {/* Public Marketing Routes */}
