@@ -26,7 +26,7 @@ function AnimatedRoutes() {
   const isOfficerWorkspace = location.pathname.startsWith('/officer-dashboard');
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-0 sm:min-h-screen">
       {/* Hide marketing Navbar & Footer when inside Officer Work Tool Workspace */}
       {!isOfficerWorkspace && <Navbar />}
 
