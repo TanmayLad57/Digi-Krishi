@@ -16,6 +16,7 @@ import HowItWorksPage from './pages/HowItWorksPage';
 import WhyUsPage from './pages/WhyUsPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import EditProfilePage from './pages/EditProfilePage';
 import FarmerDashboardPage from './pages/FarmerDashboardPage';
 import OfficerDashboardPage from './pages/OfficerDashboardPage';
 import OfficerCasesPage from './pages/OfficerCasesPage';
@@ -40,6 +41,7 @@ function AnimatedRoutes() {
             <Route path="/why-us" element={<WhyUsPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/edit-profile" element={<EditProfilePage />} />
             <Route path="/farmer-dashboard" element={<FarmerDashboardPage />} />
 
             {/* Protected Agriculture Officer Work Tool Section */}

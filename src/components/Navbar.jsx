@@ -19,6 +19,7 @@ import {
   User,
   LogOut,
   LayoutDashboard,
+  UserCog,
   Globe
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -335,6 +336,15 @@ export default function Navbar() {
                           >
                             <LayoutDashboard className="w-4 h-4 text-[#1b4332]" />
                             <span>{t('navbar.myDashboard')}</span>
+                          </Link>
+
+                          <Link
+                            to="/edit-profile"
+                            onClick={() => setUserDropdownOpen(false)}
+                            className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-100 text-xs font-bold text-gray-800"
+                          >
+                            <UserCog className="w-4 h-4 text-[#1b4332]" />
+                            <span>Edit Profile</span>
                           </Link>
 
                           <Link
