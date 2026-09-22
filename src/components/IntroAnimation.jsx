@@ -42,7 +42,7 @@ export default function IntroAnimation({ onComplete }) {
           <div className="w-full h-full flex flex-col items-center justify-center">
             <MorphText
               words={['GROW', 'ADVISE', 'PROTECT', 'HARVEST']}
-              interval={1800}
+              interval={4000}
               subtext="Digi Krishi — AI Agricultural Advisory"
               fontSize="clamp(2.5rem, 10vw, 7rem)"
               textColor="#faf8f5"

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getFarmerQueries } from '../lib/queries';
+import MarkdownText from '../components/MarkdownText';
 
 export default function FarmerDashboardPage() {
   const { t } = useTranslation();
@@ -165,11 +166,8 @@ export default function FarmerDashboardPage() {
                         </div>
 
                         <h4 className="text-sm font-bold text-gray-900 leading-snug">
-                          {item.aiDiagnosis || item.question}
+                          {item.question}
                         </h4>
-                        <p className="text-xs text-gray-600 font-body line-clamp-1">
-                          "{item.question}"
-                        </p>
                       </div>
 
                       <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
@@ -267,12 +265,8 @@ export default function FarmerDashboardPage() {
                               </span>
                             </div>
 
-                            <div className="text-sm font-bold text-amber-950">
-                              {t('dashboard.condition')} {item.aiDiagnosis}
-                            </div>
-
                             <p className="text-xs sm:text-sm text-gray-800 font-body leading-relaxed">
-                              {item.remedy}
+                              <MarkdownText>{item.remedy}</MarkdownText>
                             </p>
                           </div>
 
@@ -297,7 +291,7 @@ export default function FarmerDashboardPage() {
                                 <span>{t('dashboard.officerResponse')} (Dr. Sunita Sharma)</span>
                               </div>
                               <p className="text-xs sm:text-sm font-semibold text-emerald-950 leading-relaxed">
-                                "{item.officerResponse}"
+                                <MarkdownText>{item.officerResponse}</MarkdownText>
                               </p>
                             </div>
                           )}

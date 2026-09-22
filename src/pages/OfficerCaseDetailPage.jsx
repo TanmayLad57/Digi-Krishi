@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getOfficerQuery, updateOfficerQuery } from '../lib/queries';
+import MarkdownText from '../components/MarkdownText';
 
 export default function OfficerCaseDetailPage() {
   const { caseId } = useParams();
@@ -268,7 +269,7 @@ export default function OfficerCaseDetailPage() {
             <div className="space-y-2 text-xs text-gray-800 font-body">
               <div>
                 <span className="font-bold text-gray-900 block">AI Detected Condition:</span>
-                <span className="font-bold text-amber-950 text-sm">{caseData.aiDiagnosis}</span>
+                <span className="font-bold text-amber-950 text-sm"><MarkdownText>{caseData.aiDiagnosis}</MarkdownText></span>
               </div>
 
               <div className="p-3 rounded-xl bg-amber-100/60 border border-amber-200 text-amber-900 font-semibold flex items-center gap-2">
