@@ -344,7 +344,7 @@ export default function Navbar() {
                             className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-100 text-xs font-bold text-gray-800"
                           >
                             <UserCog className="w-4 h-4 text-[#1b4332]" />
-                            <span>Edit Profile</span>
+                            <span>{t('navbar.editProfile')}</span>
                           </Link>
 
                           <Link

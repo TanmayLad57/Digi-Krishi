@@ -28,6 +28,8 @@ export async function registerFarmer(farmerForm) {
     district,
     taluka,
     village,
+    pinCode,
+    pincode,
     primaryCrop,
     secondaryCrop,
     cropStage,
@@ -62,6 +64,7 @@ export async function registerFarmer(farmerForm) {
   if (profileError) throw profileError
 
   // 3. Insert farmer_details row
+  const rawPincode = (pincode || pinCode || '').toString().trim()
   const { error: farmerError } = await supabase.from('farmer_details').insert({
     id: userId,
     phone,
@@ -70,6 +73,7 @@ export async function registerFarmer(farmerForm) {
     district,
     taluka,
     village: village || null,
+    pincode: rawPincode || null,
     primary_crop: primaryCrop,
     secondary_crop: secondaryCrop || null,
     crop_stage: cropStage,

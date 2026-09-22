@@ -68,6 +68,7 @@ async function loadUserProfile(supabaseUser) {
       district: details?.district,
       taluka: details?.taluka,
       village: details?.village,
+      pinCode: details?.pincode || details?.pin_code || details?.pinCode || '',
       primaryCrop: details?.primary_crop,
       secondaryCrop: details?.secondary_crop,
       cropStage: details?.crop_stage,

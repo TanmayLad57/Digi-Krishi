@@ -449,6 +449,19 @@ export default function RegisterPage() {
                         />
                       </div>
                     </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-xs font-bold text-gray-900 uppercase">
+                        {t('auth.pinCodeLabel', 'PIN Code (Optional)')}
+                      </label>
+                      <input
+                        type="text"
+                        value={farmerForm.pinCode || farmerForm.pincode || ''}
+                        onChange={(e) => setFarmerForm({ ...farmerForm, pinCode: e.target.value, pincode: e.target.value })}
+                        placeholder={t('auth.pinCodePlaceholder', 'e.g. 440001')}
+                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-semibold text-gray-900 bg-white placeholder:text-gray-400 shadow-sm"
+                      />
+                    </div>
                   </>
                 ) : (
                   <>
