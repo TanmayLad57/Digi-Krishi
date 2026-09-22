@@ -103,6 +103,11 @@ export default function EditProfilePage() {
       const userId = currentUser?.id || (await supabase.auth.getUser()).data.user?.id;
       if (!userId) throw new Error(t('editProfile.signInAgain'));
       if (role === 'farmer') {
+        // Pincode validation: if non-empty, must be exactly 6 digits
+        const pinVal = (farmerForm.pincode || '').toString().trim();
+        if (pinVal && !/^\d{6}$/.test(pinVal)) {
+          throw new Error(t('register.validationPincode'));
+        }
         const { error: profileError } = await supabase
           .from('profiles')
           .update({ full_name: farmerForm.fullName.trim() })
@@ -222,8 +227,16 @@ export default function EditProfilePage() {
                       value={form.pincode}
                       onChange={(e) => setFarmerForm({ ...form, pincode: e.target.value })}
                       placeholder={t('editProfile.pincodePlaceholder')}
-                      className={inputClass}
+                      maxLength={6}
+                      className={`w-full px-4 py-3 rounded-2xl border-2 focus:outline-none text-sm font-semibold text-gray-900 bg-white shadow-sm ${
+                        form.pincode && !/^\d{6}$/.test(form.pincode)
+                          ? 'border-red-400 focus:border-red-500'
+                          : 'border-gray-300 focus:border-[#1b4332]'
+                      }`}
                     />
+                    {form.pincode && !/^\d{6}$/.test(form.pincode) && (
+                      <p className="text-xs font-semibold text-red-600 mt-1">{t('register.validationPincode')}</p>
+                    )}
                   </Field>
                 </div>
 
