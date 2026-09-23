@@ -20,7 +20,7 @@ export default function IntroAnimation({ onComplete }) {
     // Total cycle: 4 words * 1800ms = 7200ms + small buffer before smooth auto-fade
     timerRef.current = setTimeout(() => {
       handleFinish();
-    }, 7800);
+    }, 3200);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -42,7 +42,7 @@ export default function IntroAnimation({ onComplete }) {
           <div className="w-full h-full flex flex-col items-center justify-center">
             <MorphText
               words={['GROW', 'ADVISE', 'PROTECT', 'HARVEST']}
-              interval={4000}
+              interval={750}
               subtext="Digi Krishi — AI Agricultural Advisory"
               fontSize="clamp(2.5rem, 10vw, 7rem)"
               textColor="#faf8f5"
