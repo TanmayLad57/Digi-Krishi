@@ -18,7 +18,7 @@ export default function Footer() {
               <img
                 src="/images/logo.png"
                 alt="Digi Krishi"
-                className="h-12 w-auto rounded-xl object-contain shadow-md group-hover:opacity-90 transition-opacity"
+                className="h-12 w-auto object-contain group-hover:opacity-90 transition-opacity"
               />
             </Link>
 

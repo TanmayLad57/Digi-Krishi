@@ -61,7 +61,7 @@ export default function LanguageSelectionOverlay() {
               <img
                 src="/images/logo.png"
                 alt="Digi Krishi"
-                className="h-20 sm:h-24 w-auto rounded-2xl shadow-lg object-contain"
+                className="h-20 sm:h-24 w-auto object-contain"
               />
             </div>
 

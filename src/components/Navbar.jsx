@@ -149,7 +149,7 @@ export default function Navbar() {
               <img
                 src="/images/logo.png"
                 alt="Digi Krishi Logo"
-                className="h-9 sm:h-11 w-auto rounded-xl object-contain shadow-sm group-hover:opacity-90 transition-opacity"
+                className="h-9 sm:h-11 w-auto object-contain group-hover:opacity-90 transition-opacity"
               />
               <div className="flex flex-col">
                 <span className="font-serif-display text-lg sm:text-2xl font-bold tracking-tight text-[#111827] leading-none">
