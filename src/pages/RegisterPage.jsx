@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sprout, UserCheck, ArrowRight, ArrowLeft, CheckCircle2, ShieldCheck, Droplets, Calendar, Layers } from 'lucide-react';
 import { INDIA_STATES_DISTRICTS, POPULAR_CROPS } from '../data/locationData';
-import { registerFarmer, registerOfficer } from '../lib/auth';
+import { registerFarmer, registerOfficer, logout } from '../lib/auth';
 
 import { useTranslation } from 'react-i18next';
 
@@ -163,11 +163,11 @@ export default function RegisterPage() {
     try {
       if (role === 'farmer') {
         await registerFarmer(farmerForm);
-        navigate(redirectPath || '/farmer-dashboard');
       } else {
         await registerOfficer(officerForm);
-        navigate(redirectPath || '/officer-dashboard');
       }
+      await logout();
+      navigate(role === 'officer' ? '/login?role=officer' : '/login');
     } catch (err) {
       setSubmitError(err.message || 'Registration failed. Please try again.');
     } finally {
