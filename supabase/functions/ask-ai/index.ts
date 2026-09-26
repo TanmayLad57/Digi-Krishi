@@ -39,7 +39,7 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: "Invalid or expired authentication token" }, 401);
     }
 
-    const { question, language } = await request.json();
+    const { question, language, conversationHistory } = await request.json();
     if (typeof question !== "string" || !question.trim() || typeof language !== "string" || !language.trim()) {
       return jsonResponse({ error: "question and language are required strings" }, 400);
     }
@@ -61,6 +61,24 @@ Deno.serve(async (request) => {
     };
     const targetLanguage = languageMap[language.trim().toLowerCase().split("-")[0]] ?? language.trim();
 
+    const historyMessages: Array<{ role: "user" | "assistant"; content: string }> = [];
+    if (Array.isArray(conversationHistory)) {
+      for (const msg of conversationHistory) {
+        if (
+          msg &&
+          typeof msg === "object" &&
+          (msg.role === "user" || msg.role === "assistant") &&
+          typeof msg.content === "string" &&
+          msg.content.trim()
+        ) {
+          historyMessages.push({
+            role: msg.role,
+            content: msg.content.trim(),
+          });
+        }
+      }
+    }
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 25_000);
 
@@ -80,6 +98,7 @@ Deno.serve(async (request) => {
               role: "system",
               content: `${farmerContext ? `${farmerContext} ` : ""}You are an agricultural advisory assistant for Indian farmers. You MUST respond in ${targetLanguage} regardless of what language or script the input text appears to be written in. Both identifiedCondition and treatmentPlan MUST be written in ${targetLanguage}. Always return a JSON object with these exact fields: identifiedCondition (string), confidenceScore (number 0-100), treatmentPlan (string).`,
             },
+            ...historyMessages,
             { role: "user", content: question.trim() },
           ],
         }),

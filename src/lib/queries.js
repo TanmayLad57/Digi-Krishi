@@ -34,6 +34,18 @@ export async function createQuery({ farmerId, mode, question, response, confiden
   return data;
 }
 
+export async function updateQuery(queryId, updates) {
+  const { data, error } = await supabase
+    .from('queries')
+    .update(updates)
+    .eq('id', queryId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function getFarmerQueries(farmerId, fallbackCrop = 'Crop advisory') {
   const { data, error } = await supabase
     .from('queries')
