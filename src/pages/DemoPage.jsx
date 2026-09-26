@@ -811,52 +811,54 @@ export default function DemoPage() {
                   exit={{ opacity: 0, y: -10 }}
                   className="space-y-6"
                 >
-                  <form onSubmit={(e) => { e.preventDefault(); handleTextSubmit(); }} className="space-y-3">
-                    <label className="block text-sm font-bold text-gray-900">
-                      {t('aiPage.typeQuestionLabel')}
-                    </label>
+                  {!activeAnswer && (
+                    <form onSubmit={(e) => { e.preventDefault(); handleTextSubmit(); }} className="space-y-3">
+                      <label className="block text-sm font-bold text-gray-900">
+                        {t('aiPage.typeQuestionLabel')}
+                      </label>
 
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <input
-                        type="text"
-                        value={userQuery}
-                        onChange={(e) => setUserQuery(e.target.value)}
-                        placeholder={t('aiPage.textPlaceholder')}
-                        className="flex-1 px-4 py-3.5 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium text-gray-900 shadow-sm"
-                      />
-                      <button
-                        type="submit"
-                        disabled={isAnalyzingText}
-                        className="px-6 py-3.5 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 shrink-0 transition-all cursor-pointer"
-                      >
-                        {isAnalyzingText ? (
-                          <>
-                            <RefreshCw className="w-4 h-4 animate-spin" />
-                            <span>{t('aiPage.btnAnalyzing')}</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>{t('aiPage.btnAsk')}</span>
-                            <Send className="w-4 h-4" />
-                          </>
-                        )}
-                      </button>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2 pt-1">
-                      <span className="text-xs font-bold text-gray-500">{t('aiPage.orClickSample')}</span>
-                      {samplePrompts.map((prompt, pIdx) => (
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <input
+                          type="text"
+                          value={userQuery}
+                          onChange={(e) => setUserQuery(e.target.value)}
+                          placeholder={t('aiPage.textPlaceholder')}
+                          className="flex-1 px-4 py-3.5 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium text-gray-900 shadow-sm"
+                        />
                         <button
-                          key={pIdx}
-                          type="button"
-                          onClick={() => handleTextSubmit(prompt)}
-                          className="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 hover:bg-[#1b4332]/10 hover:text-[#1b4332] text-gray-700 border border-gray-200 transition-colors cursor-pointer"
+                          type="submit"
+                          disabled={isAnalyzingText}
+                          className="px-6 py-3.5 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 shrink-0 transition-all cursor-pointer"
                         >
-                          "{prompt}"
+                          {isAnalyzingText ? (
+                            <>
+                              <RefreshCw className="w-4 h-4 animate-spin" />
+                              <span>{t('aiPage.btnAnalyzing')}</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>{t('aiPage.btnAsk')}</span>
+                              <Send className="w-4 h-4" />
+                            </>
+                          )}
                         </button>
-                      ))}
-                    </div>
-                  </form>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                        <span className="text-xs font-bold text-gray-500">{t('aiPage.orClickSample')}</span>
+                        {samplePrompts.map((prompt, pIdx) => (
+                          <button
+                            key={pIdx}
+                            type="button"
+                            onClick={() => handleTextSubmit(prompt)}
+                            className="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 hover:bg-[#1b4332]/10 hover:text-[#1b4332] text-gray-700 border border-gray-200 transition-colors cursor-pointer"
+                          >
+                            "{prompt}"
+                          </button>
+                        ))}
+                      </div>
+                    </form>
+                  )}
 
                   {!textSubmitted && !isAnalyzingText && (
                     <div className="p-8 rounded-2xl border-2 border-dashed border-gray-300 text-center bg-gray-50 space-y-2">
