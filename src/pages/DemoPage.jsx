@@ -20,7 +20,9 @@ import {
   Lock,
   X,
   User,
-  UserPlus
+  UserPlus,
+  Wrench,
+  FileText
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { createQuery, updateQuery } from '../lib/queries';
@@ -1503,84 +1505,49 @@ export default function DemoPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="space-y-6"
+                  className="bg-[#f4f7f4] rounded-3xl p-6 sm:p-10 border border-[#1b4332]/10"
                 >
-                  <form onSubmit={handleSchemeSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <label className="block text-xs font-bold text-gray-900 uppercase">{t('aiPage.schemeSelectLabel')}</label>
-                        <select
-                          value={selectedScheme}
-                          onChange={(e) => setSelectedScheme(e.target.value)}
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-bold text-gray-900 bg-white"
-                        >
-                          <option value="pm-kisan">PM Kisan Samman Nidhi Yojana</option>
-                          <option value="pm-kusum">PM-KUSUM Solar Pump 60% Subsidy</option>
-                          <option value="soil-card">Soil Health Card & Fertilizer Grant</option>
-                        </select>
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="block text-xs font-bold text-gray-900 uppercase">{t('aiPage.idLabel')}</label>
-                        <input
-                          type="text"
-                          value={farmerIdInput}
-                          onChange={(e) => setFarmerIdInput(e.target.value)}
-                          placeholder={t('aiPage.idPlaceholder')}
-                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 focus:border-[#1b4332] focus:outline-none text-sm font-medium text-gray-900"
-                        />
-                      </div>
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                    {/* Illustration Column */}
+                    <div className="md:col-span-5 flex items-center justify-center">
+                      <img
+                        src="/images/government-schemes-illustration.png"
+                        alt="Government Schemes Advisory Illustration"
+                        className="w-full max-w-[280px] sm:max-w-[320px] h-auto object-contain drop-shadow-sm"
+                      />
                     </div>
 
-                    <button
-                      type="submit"
-                      disabled={isVerifyingScheme}
-                      className="w-full py-3.5 rounded-2xl bg-[#1b4332] hover:bg-[#2d6a4f] disabled:bg-gray-300 text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
-                    >
-                      {isVerifyingScheme ? (
-                        <>
-                          <RefreshCw className="w-4 h-4 animate-spin" />
-                          <span>{t('aiPage.verifyingScheme')}</span>
-                        </>
-                      ) : (
-                        <>
-                          <Search className="w-4 h-4" />
-                          <span>{t('aiPage.btnCheckScheme')}</span>
-                        </>
-                      )}
-                    </button>
-                  </form>
-
-                  {schemeSubmitted && !isVerifyingScheme && schemeAnswer && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 15 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="space-y-4 pt-2"
-                    >
-                      <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                        <h4 className="font-serif-display text-xl font-bold text-[#111827]">
-                          {t('aiPage.schemeResultTitle')}
-                        </h4>
-                        <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900">
-                          AI Confidence: {schemeAnswer.aiConfidence}% (Resolved)
-                        </span>
+                    {/* Content Column */}
+                    <div className="md:col-span-7 space-y-4 text-left">
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200/80 text-xs font-bold uppercase tracking-wider">
+                        <Wrench className="w-3.5 h-3.5 text-[#d97706]" />
+                        <span>FEATURE IN PROGRESS</span>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="p-4 rounded-2xl bg-[#faf8f5] border-2 border-emerald-300 space-y-1">
-                          <div className="text-xs text-gray-600 font-bold">{schemeAnswer.statusTitle || 'PM-KISAN Status'}</div>
-                          <div className="text-base font-bold text-emerald-950">{schemeAnswer.statusDetail || schemeAnswer.remedy}</div>
-                          <div className="text-[11px] text-emerald-800 font-semibold">{schemeAnswer.statusSub || 'e-KYC Verified'}</div>
-                        </div>
+                      <h2 className="font-serif-display text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+                        Government Schemes Section Coming Soon
+                      </h2>
 
-                        <div className="p-4 rounded-2xl bg-[#faf8f5] border-2 border-amber-300 space-y-1">
-                          <div className="text-xs text-gray-600 font-bold">PM-KUSUM Solar Pump Subsidy</div>
-                          <div className="text-base font-bold text-amber-950">60% State Government Subsidy Eligible</div>
-                          <div className="text-[11px] text-amber-800 font-semibold">5HP Solar Pump Application Approved</div>
+                      <p className="text-xs sm:text-sm text-gray-600 font-body leading-relaxed max-w-xl">
+                        We are working on integrating latest government schemes and real-time subsidy status for farmers. This feature will be available soon.
+                      </p>
+
+                      <div className="flex flex-wrap items-center gap-2.5 pt-2">
+                        <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-gray-200 shadow-xs">
+                          <FileText className="w-4 h-4 text-[#1b4332]" />
+                          <span className="text-xs font-bold text-gray-800">Latest Scheme Information</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-gray-200 shadow-xs">
+                          <CheckCircle2 className="w-4 h-4 text-[#2d6a4f]" />
+                          <span className="text-xs font-bold text-gray-800">Eligibility Check</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-gray-200 shadow-xs">
+                          <Sprout className="w-4 h-4 text-[#2d6a4f]" />
+                          <span className="text-xs font-bold text-gray-800">Personalized Recommendations</span>
                         </div>
                       </div>
-                    </motion.div>
-                  )}
+                    </div>
+                  </div>
                 </motion.div>
               )}
 
