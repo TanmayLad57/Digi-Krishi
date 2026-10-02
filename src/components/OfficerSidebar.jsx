@@ -54,9 +54,11 @@ export default function OfficerSidebar() {
       {/* Mobile Top Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#132a22] text-white px-4 py-3 flex items-center justify-between shadow-md">
         <Link to="/officer-dashboard" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#2d6a4f] text-[#e9c46a] flex items-center justify-center font-bold">
-            <Sprout className="w-4 h-4" />
-          </div>
+          <img
+            src="/images/work-portal-logo.png"
+            alt="Work Tool Portal Logo"
+            className="w-8 h-8 rounded-lg object-cover shrink-0"
+          />
           <span className="font-serif-display text-lg font-bold text-[#f3eee7]">
             Digi <span className="text-[#e9c46a]">Krishi</span>
           </span>
@@ -125,9 +127,11 @@ export default function OfficerSidebar() {
         
         {/* Brand Header */}
         <div className="p-6 border-b border-[#2d6a4f]/30 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#2d6a4f] flex items-center justify-center text-[#e9c46a] shadow-md shrink-0">
-            <Sprout className="w-5 h-5" />
-          </div>
+          <img
+            src="/images/work-portal-logo.png"
+            alt="Work Tool Portal Logo"
+            className="w-10 h-10 rounded-xl object-cover shadow-md shrink-0"
+          />
           <div>
             <span className="font-serif-display text-xl font-bold text-[#f3eee7] leading-none block">
               Digi <span className="text-[#e9c46a]">Krishi</span>
