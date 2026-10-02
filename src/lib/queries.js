@@ -60,7 +60,7 @@ export async function getFarmerQueries(farmerId, fallbackCrop = 'Crop advisory')
 export async function getOfficerQueries() {
   const { data, error } = await supabase
     .from('queries')
-    .select('*, profiles!queries_farmer_id_fkey(full_name, farmer_details(phone, state, district, taluka, village, primary_crop, additional_crops, land_area_acres))')
+    .select('*')
     .eq('status', 'escalated')
     .order('created_at', { ascending: false });
 
@@ -71,7 +71,7 @@ export async function getOfficerQueries() {
 export async function getOfficerQuery(queryId) {
   const { data, error } = await supabase
     .from('queries')
-    .select('*, profiles!queries_farmer_id_fkey(full_name, farmer_details(phone, state, district, taluka, village, primary_crop, additional_crops, land_area_acres))')
+    .select('*')
     .eq('id', queryId)
     .single();
 
@@ -109,20 +109,58 @@ async function toFarmerHistory(row, fallbackCrop) {
 }
 
 async function toOfficerCase(row) {
-  const profile = row.profiles || {};
-  const details = Array.isArray(profile.farmer_details) ? profile.farmer_details[0] : profile.farmer_details || {};
+  let profile = row.profiles || null;
+  let details = Array.isArray(profile?.farmer_details) ? profile.farmer_details[0] : profile?.farmer_details || null;
+
+  if (row.farmer_id) {
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('id, role, full_name, farmer_details(*)')
+      .eq('id', row.farmer_id)
+      .maybeSingle();
+
+    if (profileData) {
+      profile = profileData;
+      if (profileData.farmer_details) {
+        details = Array.isArray(profileData.farmer_details) ? profileData.farmer_details[0] : profileData.farmer_details;
+      }
+    }
+
+    if (!details) {
+      const { data: detailsData } = await supabase
+        .from('farmer_details')
+        .select('*')
+        .eq('id', row.farmer_id)
+        .maybeSingle();
+      if (detailsData) {
+        details = detailsData;
+      }
+    }
+  }
+
+  // Use the SECURITY DEFINER RPC to retrieve the farmer name,
+  // bypassing the profiles RLS that blocks officer → farmer reads.
+  // Returns null if the caller is not an officer or the case is not escalated.
+  const { data: rpcFarmerName } = await supabase.rpc(
+    'get_escalated_case_farmer_name',
+    { p_query_id: row.id }
+  );
+
+  profile = profile || {};
+  details = details || {};
   const hasOfficerResponse = Boolean(row.officer_response);
   const crop = details.primary_crop || 'Not specified';
+
   return {
     id: row.id,
-    farmerName: profile.full_name || 'Farmer',
+    farmerName: rpcFarmerName || profile.full_name || 'Farmer',
     farmerPhone: details.phone || '',
     state: details.state || 'Not provided',
     district: details.district || 'Not provided',
     taluka: details.taluka || 'Not provided',
     village: details.village || 'Not provided',
     landArea: details.land_area_acres ? `${details.land_area_acres} Acres` : 'Not provided',
-    crops: details.additional_crops || [crop],
+    crops: (Array.isArray(details.additional_crops) && details.additional_crops.length > 0) ? details.additional_crops : [crop],
     crop,
     queryType: modeLabels[row.mode] || row.mode,
     question: row.question,
