@@ -288,7 +288,7 @@ export default function FarmerDashboardPage() {
                             <div className="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-300 space-y-2">
                               <div className="flex items-center gap-2 text-xs font-bold text-emerald-900 uppercase">
                                 <UserCheck className="w-4 h-4 text-emerald-600" />
-                                <span>{t('dashboard.officerResponse')} (Dr. Sunita Sharma)</span>
+                                <span>{t('dashboard.officerResponse')}{item.officerName ? ` (${item.officerName})` : ''}</span>
                               </div>
                               <p className="text-xs sm:text-sm font-semibold text-emerald-950 leading-relaxed">
                                 <MarkdownText>{item.officerResponse}</MarkdownText>

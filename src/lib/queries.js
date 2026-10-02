@@ -90,6 +90,15 @@ export async function updateOfficerQuery(queryId, officerId, updates) {
 
 async function toFarmerHistory(row, fallbackCrop) {
   const isEscalated = row.status === 'escalated';
+  let officerName = null;
+  if (row.officer_response || row.status === 'resolved' || row.officer_id) {
+    const { data: rpcOfficerName } = await supabase.rpc(
+      'get_resolved_case_officer_name',
+      { p_query_id: row.id }
+    );
+    officerName = rpcOfficerName || null;
+  }
+
   return {
     id: row.id,
     date: formatDate(row.created_at),
@@ -104,6 +113,7 @@ async function toFarmerHistory(row, fallbackCrop) {
     audioTranscript: row.mode === 'voice' ? row.question : null,
     audioUrl: await createVoiceUrl(row.voice_url),
     officerResponse: row.officer_response,
+    officerName,
     escalationNote: isEscalated ? `AI confidence (${row.confidence}%) is below the 80% escalation threshold.` : null,
   };
 }
