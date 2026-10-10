@@ -132,6 +132,29 @@ export default function Navbar() {
     },
   ];
 
+  if (isAuthenticated) {
+    const dashboardPath = currentUser?.role === 'officer' ? '/officer-dashboard' : '/farmer-dashboard';
+    navStructure.push({
+      name: t('navbar.myDashboard'),
+      key: 'MyDashboard',
+      path: dashboardPath,
+      subLinks: [
+        {
+          title: t('navbar.myDashboard'),
+          desc: currentUser?.role === 'officer' ? t('navbar.officerRole') : t('navbar.kisanRole'),
+          path: dashboardPath,
+          icon: LayoutDashboard,
+        },
+        {
+          title: t('navbar.editProfile'),
+          desc: currentUser?.name || t('navbar.editProfile'),
+          path: '/edit-profile',
+          icon: UserCog,
+        },
+      ],
+    });
+  }
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -140,7 +163,7 @@ export default function Navbar() {
           : 'bg-[#faf8f5]/80 py-4 border-b border-gray-200/50'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 xl:px-8">
         <div className="flex items-center justify-between">
           
           {/* Left: Logo & Brand Identity */}
@@ -155,7 +178,7 @@ export default function Navbar() {
                 <span className="font-serif-display text-lg sm:text-2xl font-bold tracking-tight text-[#111827] leading-none">
                   {t('navbar.brandName')}
                 </span>
-                <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-[#1b4332] mt-0.5">
+                <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-[#1b4332] mt-0.5 lg:hidden xl:block">
                   {t('navbar.brandTagline')}
                 </span>
               </div>
@@ -164,7 +187,7 @@ export default function Navbar() {
 
           {/* Center: Desktop Navigation Links (True Horizontal Center) */}
           <div className="hidden lg:flex flex-none items-center justify-center">
-            <nav className="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm">
+            <nav className="flex items-center gap-0.5 xl:gap-1 bg-white px-2 xl:px-3 py-1 xl:py-1.5 rounded-full border border-gray-200 shadow-sm">
               {navStructure.map((item) => {
                 const isActive = location.pathname === item.path;
                 const isDropdownOpen = activeDropdown === item.key;
@@ -178,7 +201,7 @@ export default function Navbar() {
                   >
                     <NavLink
                       to={item.path}
-                      className={`inline-flex items-center gap-1 px-3.5 py-1.5 text-sm font-semibold rounded-full transition-all ${
+                      className={`inline-flex items-center gap-0.5 xl:gap-1 px-2.5 xl:px-3.5 py-1 xl:py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-all whitespace-nowrap ${
                         isActive
                           ? 'bg-[#1b4332] text-white shadow-sm'
                           : 'text-gray-700 hover:text-[#1b4332] hover:bg-gray-100'
@@ -186,7 +209,7 @@ export default function Navbar() {
                     >
                       <span>{item.name}</span>
                       <ChevronDown
-                        className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                        className={`w-3 h-3 xl:w-3.5 xl:h-3.5 transition-transform duration-200 ${
                           isDropdownOpen ? 'rotate-180 text-[#d97706]' : 'text-gray-400'
                         }`}
                       />
@@ -244,7 +267,7 @@ export default function Navbar() {
           {/* Right: Actions (Desktop & Mobile) */}
           <div className="flex-1 flex items-center justify-end min-w-0">
             {/* Desktop Right Action: Language Selector + Auth Badge */}
-            <div className="hidden lg:flex items-center gap-3">
+            <div className="hidden lg:flex items-center gap-1.5 xl:gap-3">
               
               {/* Language Switcher Dropdown */}
               <div className="relative">
@@ -253,7 +276,7 @@ export default function Navbar() {
                     setLangDropdownOpen(!langDropdownOpen);
                     setUserDropdownOpen(false);
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-gray-100 border border-gray-300 text-gray-800 font-bold text-xs shadow-sm transition-all cursor-pointer"
+                  className="flex items-center gap-1 xl:gap-1.5 px-2.5 xl:px-3 py-1 xl:py-1.5 rounded-full bg-white hover:bg-gray-100 border border-gray-300 text-gray-800 font-bold text-xs shadow-sm transition-all cursor-pointer whitespace-nowrap"
                   title="Select Language"
                 >
                   <Globe className="w-4 h-4 text-[#1b4332]" />
@@ -295,16 +318,16 @@ export default function Navbar() {
                       setUserDropdownOpen(!userDropdownOpen);
                       setLangDropdownOpen(false);
                     }}
-                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white border border-gray-300 hover:border-[#1b4332] shadow-sm transition-all"
+                    className="flex items-center gap-1.5 xl:gap-2.5 px-2.5 xl:px-3 py-1 xl:py-1.5 rounded-full bg-white border border-gray-300 hover:border-[#1b4332] shadow-sm transition-all"
                   >
                     <div className="w-7 h-7 rounded-full bg-[#1b4332] text-[#e9c46a] font-bold text-xs flex items-center justify-center">
                       {currentUser.name.charAt(0)}
                     </div>
                     <div className="text-left leading-tight">
-                      <span className="block text-xs font-bold text-gray-900 truncate max-w-[120px]">
+                      <span className="block text-xs font-bold text-gray-900 truncate max-w-[70px] xl:max-w-[120px]">
                         {currentUser.name}
                       </span>
-                      <span className="block text-[10px] uppercase font-bold text-[#d97706]">
+                      <span className="block text-[9px] xl:text-[10px] uppercase font-bold text-[#d97706] truncate">
                         {currentUser.role === 'officer' ? t('navbar.officerRole') : t('navbar.kisanRole')}
                       </span>
                     </div>
@@ -370,10 +393,10 @@ export default function Navbar() {
                 </div>
               ) : (
                 /* User Logged Out Buttons */
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 xl:gap-2">
                   <Link
                     to="/login?role=farmer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-gray-800 hover:text-[#1b4332] hover:bg-gray-100 border border-gray-300"
+                    className="inline-flex items-center gap-1 xl:gap-1.5 px-3 xl:px-4 py-1.5 xl:py-2 rounded-full text-xs font-bold text-gray-800 hover:text-[#1b4332] hover:bg-gray-100 border border-gray-300 whitespace-nowrap"
                   >
                     <User className="w-3.5 h-3.5 text-[#1b4332]" />
                     <span>{t('navbar.signIn')}</span>
@@ -381,7 +404,7 @@ export default function Navbar() {
 
                   <Link
                     to="/demo"
-                    className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-[#e9c46a] font-bold text-xs shadow-md"
+                    className="inline-flex items-center gap-1.5 xl:gap-2 px-3.5 xl:px-5 py-1.5 xl:py-2 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-[#e9c46a] font-bold text-xs shadow-md whitespace-nowrap"
                   >
                     <span>{t('navbar.getStarted')}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-white" />
