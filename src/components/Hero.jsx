@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Mic, Camera, MessageSquare, ArrowRight, ShieldCheck, CheckCircle2, Sparkles, Sprout } from 'lucide-react';
 
@@ -57,13 +58,13 @@ export default function Hero() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-3">
-              <a
-                href="#interactive-demo"
+              <Link
+                to="/demo"
                 className="inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-full bg-[#1b4332] hover:bg-[#2d6a4f] text-white font-semibold text-base shadow-lg shadow-[#1b4332]/25 hover:translate-y-[-2px] transition-all"
               >
                 <span>{t('hero.btnGetStarted')}</span>
                 <ArrowRight className="w-5 h-5" />
-              </a>
+              </Link>
 
               <a
                 href="#how-it-works"
