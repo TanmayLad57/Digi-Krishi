@@ -1587,13 +1587,6 @@ export default function DemoPage() {
                 </p>
               </div>
 
-              <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs font-bold text-amber-900 text-left space-y-1">
-                <span className="block">{t('aiPage.authGateNoticeTitle')}</span>
-                <span className="font-semibold block text-gray-700">
-                  {t('aiPage.authGateNoticeDesc')}
-                </span>
-              </div>
-
               <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                 <Link
                   to="/login?role=farmer&redirect=/demo"

@@ -264,8 +264,6 @@
     "schemeResultTitle": "Subsidy Verification Result",
     "authGateTitle": "Sign In to Get Personalized Advice",
     "authGateDesc": "Create a free account to ask questions, save your advisory history, and get instant recommendations tailored to your specific crops and location.",
-    "authGateNoticeTitle": "💡 Testing Hackathon Demo?",
-    "authGateNoticeDesc": "Click \"Sign In\" below and use the 1-Click Autofill Demo Login button!",
     "btnFreeAccount": "Create Free Account"
   },
   "editProfile": {
